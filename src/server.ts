@@ -2,6 +2,7 @@ import { Server } from "http";
 import config from "./app/config";
 import mongoose from "mongoose";
 import { app } from "./app";
+import { seedAdmin } from "./app/utils/seedAdmin";
 
 let server: Server;
 
@@ -20,8 +21,10 @@ const A5Server = async () => {
     process.exit(1);
   }
 };
-
-A5Server();
+(async () => {
+  await A5Server();
+  await seedAdmin();
+})();
 
 //Server error handle
 process.on("unhandledRejection", (err) => {
