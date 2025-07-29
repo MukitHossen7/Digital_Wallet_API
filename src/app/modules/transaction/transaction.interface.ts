@@ -17,7 +17,6 @@ export enum PayType {
   WITHDRAW = "WITHDRAW",
   SEND_MONEY = "SEND_MONEY",
 }
-
 export interface ITransaction {
   type: PayType;
   amount: number;

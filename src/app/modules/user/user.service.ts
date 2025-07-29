@@ -21,14 +21,19 @@ const createUser = async (payload: Partial<IUser>) => {
       password as string,
       Number(config.BCRYPT_SALT_ROUNDS)
     );
-    const user = await User.create({
-      email,
-      password: hashPassword,
-      ...rest,
-    });
+    const user = await User.create(
+      [
+        {
+          email,
+          password: hashPassword,
+          ...rest,
+        },
+      ],
+      { session }
+    );
 
     const existingWallet = await Wallet.findOne({
-      user: user._id,
+      user: user[0]._id,
     });
     if (existingWallet) {
       throw new AppError(
@@ -37,10 +42,15 @@ const createUser = async (payload: Partial<IUser>) => {
       );
     }
 
-    await Wallet.create({
-      user: user._id,
-      balance: 50,
-    });
+    await Wallet.create(
+      [
+        {
+          user: user[0]._id,
+          balance: 50,
+        },
+      ],
+      { session }
+    );
 
     await session.commitTransaction();
     session.endSession();
