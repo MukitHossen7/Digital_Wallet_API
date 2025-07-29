@@ -4,6 +4,7 @@ export enum PayStatus {
   PENDING = "PENDING",
   COMPLETED = "COMPLETED",
   FAILED = "FAILED",
+  REVERSED = "REVERSED",
 }
 
 export enum InitiatedBy {
@@ -22,7 +23,7 @@ export interface ITransaction {
   amount: number;
   senderId?: Types.ObjectId;
   receiverId?: Types.ObjectId;
-  walletId: Types.ObjectId;
+  wallet: Types.ObjectId;
   initiatedBy: InitiatedBy;
   fee?: number;
   commission?: number;

@@ -26,7 +26,7 @@ const transactionSchema = new Schema<ITransaction>(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    walletId: {
+    wallet: {
       type: Schema.Types.ObjectId,
       ref: "Wallet",
       required: true,
