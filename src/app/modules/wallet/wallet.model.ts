@@ -6,7 +6,7 @@ const walletSchema = new Schema<IWallet>(
     balance: {
       type: Number,
       required: [true, "balance is required"],
-      default: 50,
+      // default: 50,
     },
     isBlocked: {
       type: Boolean,
