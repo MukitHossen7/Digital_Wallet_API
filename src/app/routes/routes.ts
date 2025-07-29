@@ -1,10 +1,14 @@
 import { Router } from "express";
 import userRoute from "../modules/user/user.routes";
 import authRoute from "../modules/auth/auth.routes";
+import transactionRoute from "../modules/transaction/transaction.routes";
+import walletRoute from "../modules/wallet/wallet.routes";
 
 const routes = Router();
 
 routes.use("/user", userRoute);
 routes.use("/auth", authRoute);
+routes.use("/transaction", transactionRoute);
+routes.use("/wallet", walletRoute);
 
 export default routes;
