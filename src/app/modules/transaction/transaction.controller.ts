@@ -42,7 +42,28 @@ const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
     data: withdrawMoney,
   });
 });
+
+//send Money
+const sendMoney = catchAsync(async (req: Request, res: Response) => {
+  const type = PayType.SEND_MONEY;
+  const { role, id: userId } = req.user;
+  const sendMoney = await TransactionService.sendMoney(
+    req.body,
+    type,
+    role,
+    userId
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "Send Money successfully",
+    data: sendMoney,
+  });
+});
+
 export const TransactionController = {
   addMoney,
   withdrawMoney,
+  sendMoney,
 };

@@ -21,4 +21,11 @@ transactionRoute.post(
   TransactionController.withdrawMoney
 );
 
+transactionRoute.post(
+  "/send-money",
+  checkAuth(Role.USER),
+  zodValidateRequest(createTransactionZodSchema),
+  TransactionController.sendMoney
+);
+
 export default transactionRoute;
