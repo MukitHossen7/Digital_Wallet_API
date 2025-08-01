@@ -3,6 +3,7 @@ import { Wallet } from "../wallet/wallet.model";
 import { ITransaction } from "./transaction.interface";
 import httpStatus from "http-status-codes";
 import { Transaction } from "./transaction.model";
+import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
 
 // add money
 const addMoney = async (
@@ -56,12 +57,13 @@ const addMoney = async (
 const withdrawMoney = async (
   payload: ITransaction,
   type: string,
-  role: string
+  role: string,
+  userId: string
 ) => {
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
-    const isWallet = await Wallet.findById(payload.wallet);
+    const isWallet = await Wallet.findOne({ user: userId });
     if (!isWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
     }
@@ -71,18 +73,20 @@ const withdrawMoney = async (
         "This wallet is blocked. No transaction is allowed."
       );
     }
+    const { totalAmount, fee } = calculateTotalWithFee(payload.amount);
+
     await Wallet.findByIdAndUpdate(
-      payload.wallet,
+      isWallet._id,
       {
         $set: {
-          balance: isWallet.balance - payload.amount,
+          balance: isWallet.balance - totalAmount,
         },
       },
       { new: true, runValidators: true, session }
     );
 
     const withdrawMoneyTransaction = await Transaction.create(
-      [{ ...payload, type, initiatedBy: role }],
+      [{ ...payload, type, initiatedBy: role, wallet: isWallet._id, fee }],
       {
         session,
       }

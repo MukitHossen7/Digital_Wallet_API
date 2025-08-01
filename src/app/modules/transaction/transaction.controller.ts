@@ -27,11 +27,12 @@ const addMoney = catchAsync(async (req: Request, res: Response) => {
 //withdraw Money
 const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.WITHDRAW;
-  const role = req.user.role;
+  const { role, id: userId } = req.user;
   const withdrawMoney = await TransactionService.withdrawMoney(
     req.body,
     type,
-    role
+    role,
+    userId
   );
 
   sendResponse(res, {
