@@ -4,16 +4,30 @@ import { ITransaction } from "./transaction.interface";
 import httpStatus from "http-status-codes";
 import { Transaction } from "./transaction.model";
 
-const addMoney = async (payload: ITransaction) => {
+// add money
+const addMoney = async (
+  payload: ITransaction,
+  type: string,
+  role: string,
+  userId: string
+) => {
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
-    const isWallet = await Wallet.findById(payload.wallet);
+    const isWallet = await Wallet.findOne({
+      user: userId,
+    });
     if (!isWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
     }
+    if (isWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
     await Wallet.findByIdAndUpdate(
-      payload.wallet,
+      isWallet._id,
       {
         $set: {
           balance: isWallet.balance + payload.amount,
@@ -22,9 +36,12 @@ const addMoney = async (payload: ITransaction) => {
       { new: true, runValidators: true, session }
     );
 
-    const addMoneyTransaction = await Transaction.create([{ ...payload }], {
-      session,
-    });
+    const addMoneyTransaction = await Transaction.create(
+      [{ ...payload, type, initiatedBy: role, wallet: isWallet._id }],
+      {
+        session,
+      }
+    );
     await session.commitTransaction();
     session.endSession();
     return addMoneyTransaction;
@@ -35,6 +52,52 @@ const addMoney = async (payload: ITransaction) => {
   }
 };
 
+// with draw money
+const withdrawMoney = async (
+  payload: ITransaction,
+  type: string,
+  role: string
+) => {
+  const session = await Wallet.startSession();
+  session.startTransaction();
+  try {
+    const isWallet = await Wallet.findById(payload.wallet);
+    if (!isWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
+    }
+    if (isWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
+    await Wallet.findByIdAndUpdate(
+      payload.wallet,
+      {
+        $set: {
+          balance: isWallet.balance - payload.amount,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
+
+    const withdrawMoneyTransaction = await Transaction.create(
+      [{ ...payload, type, initiatedBy: role }],
+      {
+        session,
+      }
+    );
+    await session.commitTransaction();
+    session.endSession();
+    return withdrawMoneyTransaction;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 export const TransactionService = {
   addMoney,
+  withdrawMoney,
 };
