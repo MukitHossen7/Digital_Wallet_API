@@ -62,8 +62,24 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//get Transaction History by me
+const getTransactionHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id: userId } = req.user;
+    const sendMoney = await TransactionService.getTransactionHistory(userId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Retrieve Transaction History successfully",
+      data: sendMoney,
+    });
+  }
+);
+
 export const TransactionController = {
   addMoney,
   withdrawMoney,
   sendMoney,
+  getTransactionHistory,
 };

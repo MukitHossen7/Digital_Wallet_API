@@ -28,4 +28,9 @@ transactionRoute.post(
   TransactionController.sendMoney
 );
 
+transactionRoute.get(
+  "/me",
+  checkAuth(Role.USER),
+  TransactionController.getTransactionHistory
+);
 export default transactionRoute;
