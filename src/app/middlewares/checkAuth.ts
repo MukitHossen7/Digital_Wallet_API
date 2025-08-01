@@ -30,19 +30,17 @@ export const checkAuth =
         throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist");
       }
 
+      if (isExistUser.isDeleted === true) {
+        throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+      }
       if (
         isExistUser.isActive === IsActive.BLOCKED ||
-        isExistUser.isActive === IsActive.INACTIVE ||
         isExistUser.isActive === IsActive.SUSPENDED
       ) {
         throw new AppError(
           httpStatus.FORBIDDEN,
-          "Your account is blocked or inactive or suspended"
+          `Your account is ${isExistUser.isActive}`
         );
-      }
-
-      if (isExistUser.isDeleted === true) {
-        throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
       }
 
       if (!authRoles.includes(verify_token.role)) {
