@@ -10,7 +10,8 @@ export const createTransactionZodSchema = z.object({
       required_error: "amount is required",
       invalid_type_error: "amount must be a number",
     })
-    .min(50, "Minimum transaction amount is ৳50"),
+    .min(50, "Minimum transaction amount is ৳50")
+    .nonnegative(),
 
   senderId: z.string().optional(),
   receiverId: z.string().optional(),
