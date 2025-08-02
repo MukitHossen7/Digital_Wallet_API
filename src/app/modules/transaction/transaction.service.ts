@@ -213,9 +213,19 @@ const getTransactionHistory = async (userId: string) => {
   return transactionHistory;
 };
 
+//get Transaction History by me
+const getAllTransactionHistory = async () => {
+  const getAllTransaction = await Transaction.find();
+  if (getAllTransaction.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
+  }
+  return getAllTransaction;
+};
+
 export const TransactionService = {
   addMoney,
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
+  getAllTransactionHistory,
 };
