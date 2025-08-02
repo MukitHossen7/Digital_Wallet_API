@@ -18,4 +18,11 @@ userRoute.patch(
   checkAuth(Role.ADMIN),
   UserControllers.approveAgent
 );
+
+userRoute.patch(
+  "/:id/suspend",
+  checkAuth(Role.ADMIN),
+  UserControllers.suspendAgent
+);
+
 export default userRoute;

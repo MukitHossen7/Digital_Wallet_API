@@ -72,24 +72,53 @@ const approveAgent = async (id: string) => {
   if (user.isDeleted === true) {
     throw new AppError(httpStatus.FORBIDDEN, "This account is deleted");
   }
-  if (
-    user.isActive === IsActive.BLOCKED ||
-    user.isActive === IsActive.SUSPENDED
-  ) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      `This account is ${user.isActive}`
-    );
-  }
-  if (user.role === Role.AGENT) {
+  // if (
+  //   user.isActive === IsActive.BLOCKED ||
+  //   user.isActive === IsActive.SUSPENDED
+  // ) {
+  //   throw new AppError(
+  //     httpStatus.FORBIDDEN,
+  //     `This account is ${user.isActive}`
+  //   );
+  // }
+
+  if (user.role === Role.AGENT && user.isActive === IsActive.ACTIVE) {
     throw new AppError(httpStatus.BAD_REQUEST, "User is already an AGENT");
   }
   user.role = Role.AGENT;
+  user.isActive = IsActive.ACTIVE;
   await user.save();
   return user;
 };
 
+const suspendAgent = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.isDeleted === true) {
+    throw new AppError(httpStatus.FORBIDDEN, "This account is deleted");
+  }
+  // if (
+  //   user.isActive === IsActive.BLOCKED ||
+  //   user.isActive === IsActive.SUSPENDED
+  // ) {
+  //   throw new AppError(
+  //     httpStatus.FORBIDDEN,
+  //     `This account is ${user.isActive}`
+  //   );
+  // }
+
+  if (user.role === Role.AGENT && user.isActive === IsActive.SUSPENDED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is already an Suspended");
+  }
+  user.isActive = IsActive.SUSPENDED;
+  await user.save();
+  return user;
+};
 export const UserServices = {
   createUser,
   approveAgent,
+  suspendAgent,
 };

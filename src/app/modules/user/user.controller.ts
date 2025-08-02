@@ -30,7 +30,22 @@ const approveAgent = catchAsync(
   }
 );
 
+//suspend Agent
+const suspendAgent = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const suspendAgent = await UserServices.suspendAgent(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "AGENT suspend Successfully",
+      data: suspendAgent,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
   approveAgent,
+  suspendAgent,
 };
