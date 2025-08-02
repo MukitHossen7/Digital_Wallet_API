@@ -5,7 +5,12 @@ import { WalletController } from "./wallet.controller";
 
 const walletRoute = express.Router();
 
-walletRoute.get("/", checkAuth(Role.ADMIN), WalletController.getAllWallets);
+walletRoute.get(
+  "/",
+  checkAuth(Role.ADMIN),
+  WalletController.getAllWalletsByRole
+);
+
 walletRoute.get(
   "/me",
   checkAuth(Role.AGENT, Role.USER),

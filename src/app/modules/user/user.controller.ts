@@ -18,7 +18,7 @@ const createUser = catchAsync(
 
 const getAllUserOrAgent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const role = req.query.role as string;
+    const role = (req.query.role as string).toUpperCase();
     const users = await UserServices.getAllUserOrAgent(role);
     sendResponse(res, {
       statusCode: httpStatus.OK,

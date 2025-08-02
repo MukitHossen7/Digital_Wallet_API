@@ -6,12 +6,13 @@ import { WalletServices } from "./wallet.service";
 import { JwtPayload } from "jsonwebtoken";
 
 //get all wallets
-const getAllWallets = catchAsync(async (req: Request, res: Response) => {
-  const wallets = await WalletServices.getAllWallets();
+const getAllWalletsByRole = catchAsync(async (req: Request, res: Response) => {
+  const role = (req.query.role as string).toUpperCase();
+  const wallets = await WalletServices.getAllWalletsByRole(role);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "All Wallet Retrieved Successfully",
+    message: `All Wallets for role ${role} Retrieved Successfully`,
     data: wallets,
   });
 });
@@ -50,7 +51,7 @@ const unblockWallet = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const WalletController = {
-  getAllWallets,
+  getAllWalletsByRole,
   getMeWallet,
   blockWallet,
   unblockWallet,
