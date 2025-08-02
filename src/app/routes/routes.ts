@@ -6,7 +6,7 @@ import walletRoute from "../modules/wallet/wallet.routes";
 
 const routes = Router();
 
-routes.use("/user", userRoute);
+routes.use("/users", userRoute);
 routes.use("/auth", authRoute);
 routes.use("/transactions", transactionRoute);
 routes.use("/wallets", walletRoute);

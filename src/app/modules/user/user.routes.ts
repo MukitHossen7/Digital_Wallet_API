@@ -13,6 +13,8 @@ userRoute.post(
   UserControllers.createUser
 );
 
+userRoute.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUserOrAgent);
+
 userRoute.patch(
   "/:id/approve",
   checkAuth(Role.ADMIN),

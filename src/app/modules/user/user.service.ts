@@ -63,6 +63,14 @@ const createUser = async (payload: Partial<IUser>) => {
   }
 };
 
+const getAllUserOrAgent = async (role: string) => {
+  if (role !== Role.USER && role !== Role.AGENT) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
+  }
+  const users = await User.find({ role: role });
+  return users;
+};
+
 const approveAgent = async (id: string) => {
   const user = await User.findById(id);
   if (!user) {
@@ -102,4 +110,5 @@ export const UserServices = {
   createUser,
   approveAgent,
   suspendAgent,
+  getAllUserOrAgent,
 };

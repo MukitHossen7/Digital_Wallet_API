@@ -16,6 +16,19 @@ const createUser = catchAsync(
   }
 );
 
+const getAllUserOrAgent = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const role = req.query.role as string;
+    const users = await UserServices.getAllUserOrAgent(role);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `${role} Retrieve Successfully`,
+      data: users,
+    });
+  }
+);
+
 //Approve Agent
 const approveAgent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -48,4 +61,5 @@ export const UserControllers = {
   createUser,
   approveAgent,
   suspendAgent,
+  getAllUserOrAgent,
 };
