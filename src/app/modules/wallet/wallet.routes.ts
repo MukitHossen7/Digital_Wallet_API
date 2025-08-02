@@ -12,4 +12,15 @@ walletRoute.get(
   WalletController.getMeWallet
 );
 
+walletRoute.patch(
+  "/:id/block",
+  checkAuth(Role.ADMIN),
+  WalletController.blockWallet
+);
+
+walletRoute.patch(
+  "/:id/unblock",
+  checkAuth(Role.ADMIN),
+  WalletController.unblockWallet
+);
 export default walletRoute;

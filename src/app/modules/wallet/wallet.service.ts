@@ -20,7 +20,39 @@ const getMeWallet = async (id: string) => {
   return wallet;
 };
 
+const blockWallet = async (id: string) => {
+  const wallet = await Wallet.findById(id);
+
+  if (!wallet) {
+    throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+  }
+
+  if (wallet.isBlocked) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Wallet is already blocked");
+  }
+  wallet.isBlocked = true;
+  await wallet.save();
+  return wallet;
+};
+
+const unblockWallet = async (id: string) => {
+  const wallet = await Wallet.findById(id);
+
+  if (!wallet) {
+    throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+  }
+
+  if (!wallet.isBlocked) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Wallet is already unblocked");
+  }
+  wallet.isBlocked = false;
+  await wallet.save();
+  return wallet;
+};
+
 export const WalletServices = {
   getAllWallets,
   getMeWallet,
+  blockWallet,
+  unblockWallet,
 };

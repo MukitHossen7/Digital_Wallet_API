@@ -27,7 +27,31 @@ const getMeWallet = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const blockWallet = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const wallet = await WalletServices.blockWallet(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Wallet Blocked Successfully",
+    data: wallet,
+  });
+});
+
+const unblockWallet = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const wallet = await WalletServices.unblockWallet(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Wallet UnBlocked Successfully",
+    data: wallet,
+  });
+});
+
 export const WalletController = {
   getAllWallets,
   getMeWallet,
+  blockWallet,
+  unblockWallet,
 };
