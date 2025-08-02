@@ -200,12 +200,6 @@ const getTransactionHistory = async (userId: string) => {
   if (!isWallet) {
     throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
   }
-  if (isWallet.isBlocked === true) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "This wallet is blocked. No transaction history is allowed."
-    );
-  }
   const transactionHistory = await Transaction.find({ wallet: isWallet._id });
   if (transactionHistory.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
