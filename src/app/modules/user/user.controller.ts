@@ -16,6 +16,21 @@ const createUser = catchAsync(
   }
 );
 
+//Approve Agent
+const approveAgent = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const createAgent = await UserServices.approveAgent(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User has been promoted to AGENT",
+      data: createAgent,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
+  approveAgent,
 };

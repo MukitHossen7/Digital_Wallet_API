@@ -1,5 +1,5 @@
 import AppError from "../../errorHelpers/AppError";
-import { IUser } from "./user.interface";
+import { IsActive, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcrypt from "bcryptjs";
@@ -63,6 +63,33 @@ const createUser = async (payload: Partial<IUser>) => {
   }
 };
 
+const approveAgent = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.isDeleted === true) {
+    throw new AppError(httpStatus.FORBIDDEN, "This account is deleted");
+  }
+  if (
+    user.isActive === IsActive.BLOCKED ||
+    user.isActive === IsActive.SUSPENDED
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `This account is ${user.isActive}`
+    );
+  }
+  if (user.role === Role.AGENT) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is already an AGENT");
+  }
+  user.role = Role.AGENT;
+  await user.save();
+  return user;
+};
+
 export const UserServices = {
   createUser,
+  approveAgent,
 };
