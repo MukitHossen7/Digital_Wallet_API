@@ -9,6 +9,6 @@ const routes = Router();
 routes.use("/user", userRoute);
 routes.use("/auth", authRoute);
 routes.use("/transactions", transactionRoute);
-routes.use("/wallet", walletRoute);
+routes.use("/wallets", walletRoute);
 
 export default routes;
