@@ -1,6 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
 import { Wallet } from "../wallet/wallet.model";
-import { ITransaction } from "./transaction.interface";
+import { ITransaction, PayStatus } from "./transaction.interface";
 import httpStatus from "http-status-codes";
 import { Transaction } from "./transaction.model";
 import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
@@ -40,7 +40,16 @@ const addMoney = async (
     );
 
     const addMoneyTransaction = await Transaction.create(
-      [{ ...payload, type, initiatedBy: role, wallet: isWallet._id }],
+      [
+        {
+          ...payload,
+          type,
+          wallet: isWallet._id,
+          senderId: userId,
+          initiatedBy: role,
+          status: PayStatus.COMPLETED,
+        },
+      ],
       {
         session,
       }
@@ -95,7 +104,17 @@ const withdrawMoney = async (
     );
 
     const withdrawMoneyTransaction = await Transaction.create(
-      [{ ...payload, type, initiatedBy: role, wallet: isWallet._id, fee }],
+      [
+        {
+          ...payload,
+          type,
+          initiatedBy: role,
+          wallet: isWallet._id,
+          senderId: userId,
+          fee,
+          status: PayStatus.COMPLETED,
+        },
+      ],
       {
         session,
       }
@@ -173,12 +192,14 @@ const sendMoney = async (
     const withdrawMoneyTransaction = await Transaction.create(
       [
         {
-          ...payload,
+          amount: payload.amount,
           type,
           initiatedBy: role,
           wallet: isSenderWallet._id,
           fee,
           senderId: userId,
+          receiverId: payload.receiverId,
+          status: PayStatus.COMPLETED,
         },
       ],
       {
@@ -231,48 +252,66 @@ const cashIn = async (
   session.startTransaction();
   try {
     const AGENT_COMMISSION_PERCENT = 1;
-    const isWallet = await Wallet.findOne({
-      user: payload.receiverId,
-    });
-    if (!isWallet) {
+    const userWallet = await Wallet.findOne({ user: payload.receiverId });
+    if (!userWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
     }
-    if (isWallet.isBlocked === true) {
+    if (userWallet.isBlocked) {
+      throw new AppError(httpStatus.FORBIDDEN, "User wallet is blocked");
+    }
+
+    const agentWallet = await Wallet.findOne({ user: agentId });
+    if (!agentWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent wallet not found");
+    }
+    if (agentWallet.isBlocked) {
+      throw new AppError(httpStatus.FORBIDDEN, "Agent wallet is blocked");
+    }
+
+    if (agentWallet.balance < payload.amount) {
       throw new AppError(
-        httpStatus.FORBIDDEN,
-        "This wallet is blocked. No transaction is allowed."
+        httpStatus.BAD_REQUEST,
+        `Insufficient balance. You have ${agentWallet.balance}, need ${payload.amount}`
       );
     }
-    const totalBalance = isWallet.balance + payload?.amount;
+
     await Wallet.findByIdAndUpdate(
-      isWallet._id,
+      agentWallet._id,
       {
-        $set: {
-          balance: totalBalance,
-        },
+        $inc: { balance: -payload.amount },
       },
-      { new: true, runValidators: true, session }
+      { new: true, session, runValidators: true }
     );
+
+    await Wallet.findByIdAndUpdate(
+      userWallet._id,
+      {
+        $inc: { balance: payload.amount },
+      },
+      { new: true, session, runValidators: true }
+    );
+
     const commission = (AGENT_COMMISSION_PERCENT / 100) * payload.amount;
-    const cashInTransaction = await Transaction.create(
+
+    const transaction = await Transaction.create(
       [
         {
           amount: payload.amount,
           type,
           senderId: agentId,
           receiverId: payload.receiverId,
-          wallet: isWallet._id,
+          wallet: userWallet._id,
           initiatedBy: role,
           commission,
+          status: PayStatus.COMPLETED,
         },
       ],
-      {
-        session,
-      }
+      { session }
     );
+
     await session.commitTransaction();
     session.endSession();
-    return cashInTransaction;
+    return transaction;
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -333,6 +372,7 @@ const cashOut = async (
           initiatedBy: role,
           commission,
           fee,
+          status: PayStatus.COMPLETED,
         },
       ],
       {
