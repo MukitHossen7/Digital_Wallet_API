@@ -4,6 +4,7 @@ import { TransactionService } from "./transaction.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { PayType } from "./transaction.interface";
+import AppError from "../../errorHelpers/AppError";
 
 // add money
 const addMoney = catchAsync(async (req: Request, res: Response) => {
@@ -80,15 +81,21 @@ const getTransactionHistory = catchAsync(
 );
 
 //get Transaction History by admin
-const getAllTransactionHistory = catchAsync(
+const getAllTransactionHistoryByRole = catchAsync(
   async (req: Request, res: Response) => {
+    const role = req.query.role as string;
+    if (!role) {
+      throw new AppError(400, "Role query parameter is required");
+    }
     const getAllTransaction =
-      await TransactionService.getAllTransactionHistory();
+      await TransactionService.getAllTransactionHistoryByRole(
+        role.toUpperCase()
+      );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Retrieve All Transaction History successfully",
+      message: `All Transaction History for role ${role} Retrieved Successfully`,
       data: getAllTransaction,
     });
   }
@@ -99,5 +106,5 @@ export const TransactionController = {
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
-  getAllTransactionHistory,
+  getAllTransactionHistoryByRole,
 };

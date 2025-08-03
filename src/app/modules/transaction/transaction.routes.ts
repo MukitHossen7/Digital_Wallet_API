@@ -37,7 +37,7 @@ transactionRoute.get(
 transactionRoute.get(
   "/",
   checkAuth(Role.ADMIN),
-  TransactionController.getAllTransactionHistory
+  TransactionController.getAllTransactionHistoryByRole
 );
 
 export default transactionRoute;

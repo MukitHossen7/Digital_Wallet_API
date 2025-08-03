@@ -4,11 +4,15 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { WalletServices } from "./wallet.service";
 import { JwtPayload } from "jsonwebtoken";
+import AppError from "../../errorHelpers/AppError";
 
 //get all wallets
 const getAllWalletsByRole = catchAsync(async (req: Request, res: Response) => {
-  const role = (req.query.role as string).toUpperCase();
-  const wallets = await WalletServices.getAllWalletsByRole(role);
+  const role = req.query.role as string;
+  if (!role) {
+    throw new AppError(400, "Role query parameter is required");
+  }
+  const wallets = await WalletServices.getAllWalletsByRole(role.toUpperCase());
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

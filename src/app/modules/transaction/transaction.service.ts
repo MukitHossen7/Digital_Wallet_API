@@ -5,6 +5,7 @@ import httpStatus from "http-status-codes";
 import { Transaction } from "./transaction.model";
 import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
 import { calculateBySendMoneyFee } from "../../utils/calculateBySendMoneyFee";
+import { Role } from "../user/user.interface";
 
 // add money
 const addMoney = async (
@@ -207,9 +208,12 @@ const getTransactionHistory = async (userId: string) => {
   return transactionHistory;
 };
 
-//get Transaction History by me
-const getAllTransactionHistory = async () => {
-  const getAllTransaction = await Transaction.find();
+//get Transaction History
+const getAllTransactionHistoryByRole = async (role: string) => {
+  if (role !== Role.USER && role !== Role.AGENT) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
+  }
+  const getAllTransaction = await Transaction.find({ initiatedBy: role });
   if (getAllTransaction.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
   }
@@ -221,5 +225,5 @@ export const TransactionService = {
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
-  getAllTransactionHistory,
+  getAllTransactionHistoryByRole,
 };

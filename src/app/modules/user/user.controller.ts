@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { UserServices } from "./user.service";
+import AppError from "../../errorHelpers/AppError";
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,8 +19,11 @@ const createUser = catchAsync(
 
 const getAllUserOrAgent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const role = (req.query.role as string).toUpperCase();
-    const users = await UserServices.getAllUserOrAgent(role);
+    const role = req.query.role as string;
+    if (!role) {
+      throw new AppError(400, "Role query parameter is required");
+    }
+    const users = await UserServices.getAllUserOrAgent(role.toUpperCase());
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
