@@ -101,10 +101,45 @@ const getAllTransactionHistoryByRole = catchAsync(
   }
 );
 
+//cash in Agent
+const cashIn = catchAsync(async (req: Request, res: Response) => {
+  const type = PayType.ADD_MONEY;
+  const { role, id: agentId } = req.user;
+  const result = await TransactionService.cashIn(req.body, type, role, agentId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "Cash in successfully",
+    data: result,
+  });
+});
+
+//cash out Agent
+const cashOut = catchAsync(async (req: Request, res: Response) => {
+  const type = PayType.WITHDRAW;
+  const { role, id: agentId } = req.user;
+  const result = await TransactionService.cashOut(
+    req.body,
+    type,
+    role,
+    agentId
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "Cash-out Successful",
+    data: result,
+  });
+});
+
 export const TransactionController = {
   addMoney,
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
   getAllTransactionHistoryByRole,
+  cashIn,
+  cashOut,
 };

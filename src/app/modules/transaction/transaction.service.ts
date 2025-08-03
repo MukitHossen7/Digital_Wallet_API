@@ -220,10 +220,141 @@ const getAllTransactionHistoryByRole = async (role: string) => {
   return getAllTransaction;
 };
 
+//agent cash in
+const cashIn = async (
+  payload: ITransaction,
+  type: string,
+  role: string,
+  agentId: string
+) => {
+  const session = await Wallet.startSession();
+  session.startTransaction();
+  try {
+    const AGENT_COMMISSION_PERCENT = 1;
+    const isWallet = await Wallet.findOne({
+      user: payload.receiverId,
+    });
+    if (!isWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
+    }
+    if (isWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
+    const totalBalance = isWallet.balance + payload?.amount;
+    await Wallet.findByIdAndUpdate(
+      isWallet._id,
+      {
+        $set: {
+          balance: totalBalance,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
+    const commission = (AGENT_COMMISSION_PERCENT / 100) * payload.amount;
+    const cashInTransaction = await Transaction.create(
+      [
+        {
+          amount: payload.amount,
+          type,
+          senderId: agentId,
+          receiverId: payload.receiverId,
+          wallet: isWallet._id,
+          initiatedBy: role,
+          commission,
+        },
+      ],
+      {
+        session,
+      }
+    );
+    await session.commitTransaction();
+    session.endSession();
+    return cashInTransaction;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+//agent cash out
+const cashOut = async (
+  payload: ITransaction,
+  type: string,
+  role: string,
+  agentId: string
+) => {
+  const session = await Wallet.startSession();
+  session.startTransaction();
+  try {
+    const AGENT_COMMISSION_PERCENT = 1;
+    const isWallet = await Wallet.findOne({
+      user: payload.senderId,
+    });
+    if (!isWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
+    }
+    if (isWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
+    const { totalAmount, fee } = calculateTotalWithFee(payload?.amount);
+
+    if (isWallet.balance < totalAmount) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Insufficient balance. Your balance is ${isWallet.balance}, but you need ${totalAmount} including transaction charges.`
+      );
+    }
+
+    await Wallet.findByIdAndUpdate(
+      isWallet._id,
+      {
+        $set: {
+          balance: isWallet.balance - totalAmount,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
+    const commission = (AGENT_COMMISSION_PERCENT / 100) * payload.amount;
+    const cashOutTransaction = await Transaction.create(
+      [
+        {
+          amount: payload.amount,
+          type,
+          senderId: payload.senderId,
+          receiverId: agentId,
+          wallet: isWallet._id,
+          initiatedBy: role,
+          commission,
+          fee,
+        },
+      ],
+      {
+        session,
+      }
+    );
+    await session.commitTransaction();
+    session.endSession();
+    return cashOutTransaction;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 export const TransactionService = {
   addMoney,
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
   getAllTransactionHistoryByRole,
+  cashIn,
+  cashOut,
 };

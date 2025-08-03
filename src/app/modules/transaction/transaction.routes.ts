@@ -40,4 +40,18 @@ transactionRoute.get(
   TransactionController.getAllTransactionHistoryByRole
 );
 
+transactionRoute.post(
+  "/cash-in",
+  checkAuth(Role.AGENT),
+  zodValidateRequest(createTransactionZodSchema),
+  TransactionController.cashIn
+);
+
+transactionRoute.post(
+  "/cash-out",
+  checkAuth(Role.AGENT),
+  zodValidateRequest(createTransactionZodSchema),
+  TransactionController.cashOut
+);
+
 export default transactionRoute;
