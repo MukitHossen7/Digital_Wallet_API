@@ -330,32 +330,52 @@ const cashOut = async (
   session.startTransaction();
   try {
     const AGENT_COMMISSION_PERCENT = 1;
-    const isWallet = await Wallet.findOne({
+    const userWallet = await Wallet.findOne({
       user: payload.senderId,
     });
-    if (!isWallet) {
+    if (!userWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
     }
-    if (isWallet.isBlocked === true) {
+    if (userWallet.isBlocked === true) {
       throw new AppError(
         httpStatus.FORBIDDEN,
-        "This wallet is blocked. No transaction is allowed."
+        "User wallet is blocked. No transaction is allowed."
       );
     }
     const { totalAmount, fee } = calculateTotalWithFee(payload?.amount);
 
-    if (isWallet.balance < totalAmount) {
+    if (userWallet.balance < totalAmount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `Insufficient balance. Your balance is ${isWallet.balance}, but you need ${totalAmount} including transaction charges.`
+        `Insufficient balance. Your balance is ${userWallet.balance}, but you need ${totalAmount} including transaction charges.`
       );
     }
 
     await Wallet.findByIdAndUpdate(
-      isWallet._id,
+      userWallet._id,
+      {
+        $inc: {
+          balance: -totalAmount,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
+
+    const agentWallet = await Wallet.findOne({ user: agentId });
+    if (!agentWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent wallet not found");
+    }
+    if (agentWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Agent wallet is blocked. No transaction is allowed."
+      );
+    }
+    await Wallet.findByIdAndUpdate(
+      agentWallet._id,
       {
         $set: {
-          balance: isWallet.balance - totalAmount,
+          balance: agentWallet.balance + payload.amount,
         },
       },
       { new: true, runValidators: true, session }
@@ -368,7 +388,7 @@ const cashOut = async (
           type,
           senderId: payload.senderId,
           receiverId: agentId,
-          wallet: isWallet._id,
+          wallet: userWallet._id,
           initiatedBy: role,
           commission,
           fee,
