@@ -10,6 +10,7 @@ export const app = express();
 //middleware
 app.use(cookieParser());
 app.use(express.json());
+app.set("trust proxy", 1);
 app.use(cors());
 
 //routes
@@ -18,7 +19,7 @@ app.use("/api/v1", routes);
 app.get("/", (req: Request, res: Response) => {
   res.send({
     success: true,
-    message: "This is L2B5 Assignment-5 API",
+    message: "Welcome to the Digital Wallet Server",
   });
 });
 

@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const transaction_controller_1 = require("./transaction.controller");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const user_interface_1 = require("../user/user.interface");
+const zodValidateRequest_1 = require("../../middlewares/zodValidateRequest");
+const transaction_zod_validation_1 = require("./transaction.zod.validation");
+const transactionRoute = express_1.default.Router();
+transactionRoute.post("/add-money", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.addMoney);
+transactionRoute.post("/withdraw", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.withdrawMoney);
+transactionRoute.post("/send-money", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.sendMoney);
+transactionRoute.get("/me", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER, user_interface_1.Role.AGENT), transaction_controller_1.TransactionController.getTransactionHistory);
+transactionRoute.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), transaction_controller_1.TransactionController.getAllTransactionHistory);
+transactionRoute.post("/cash-in", (0, checkAuth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.cashIn);
+transactionRoute.post("/cash-out", (0, checkAuth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.cashOut);
+exports.default = transactionRoute;
