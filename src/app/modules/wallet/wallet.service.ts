@@ -18,7 +18,10 @@ const getAllWalletsByRole = async (role: string) => {
 };
 
 const getMeWallet = async (id: string) => {
-  const wallet = await Wallet.findOne({ user: id });
+  const wallet = await Wallet.findOne({ user: id }).populate({
+    path: "user",
+    select: "name email role",
+  });
 
   if (wallet?.isBlocked === true) {
     throw new AppError(

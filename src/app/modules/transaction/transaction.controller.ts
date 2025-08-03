@@ -81,21 +81,15 @@ const getTransactionHistory = catchAsync(
 );
 
 //get Transaction History by admin
-const getAllTransactionHistoryByRole = catchAsync(
+const getAllTransactionHistory = catchAsync(
   async (req: Request, res: Response) => {
-    const role = req.query.role as string;
-    if (!role) {
-      throw new AppError(400, "Role query parameter is required");
-    }
     const getAllTransaction =
-      await TransactionService.getAllTransactionHistoryByRole(
-        role.toUpperCase()
-      );
+      await TransactionService.getAllTransactionHistory();
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: `All Transaction History for role ${role} Retrieved Successfully`,
+      message: "All Transaction History Retrieved Successfully",
       data: getAllTransaction,
     });
   }
@@ -139,7 +133,7 @@ export const TransactionController = {
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
-  getAllTransactionHistoryByRole,
+  getAllTransactionHistory,
   cashIn,
   cashOut,
 };

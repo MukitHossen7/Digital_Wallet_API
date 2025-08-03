@@ -223,6 +223,7 @@ const getTransactionHistory = async (userId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
   }
   const transactionHistory = await Transaction.find({ wallet: isWallet._id });
+
   if (transactionHistory.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
   }
@@ -230,11 +231,8 @@ const getTransactionHistory = async (userId: string) => {
 };
 
 //get Transaction History
-const getAllTransactionHistoryByRole = async (role: string) => {
-  if (role !== Role.USER && role !== Role.AGENT) {
-    throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
-  }
-  const getAllTransaction = await Transaction.find({ initiatedBy: role });
+const getAllTransactionHistory = async () => {
+  const getAllTransaction = await Transaction.find();
   if (getAllTransaction.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
   }
@@ -414,7 +412,7 @@ export const TransactionService = {
   withdrawMoney,
   sendMoney,
   getTransactionHistory,
-  getAllTransactionHistoryByRole,
+  getAllTransactionHistory,
   cashIn,
   cashOut,
 };
