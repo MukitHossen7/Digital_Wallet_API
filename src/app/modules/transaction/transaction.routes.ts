@@ -30,7 +30,7 @@ transactionRoute.post(
 
 transactionRoute.get(
   "/me",
-  checkAuth(Role.USER),
+  checkAuth(Role.USER, Role.AGENT),
   TransactionController.getTransactionHistory
 );
 
