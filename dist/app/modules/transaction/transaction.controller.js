@@ -50,7 +50,7 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
-        message: "Send Money successfully",
+        message: "Money sent successfully",
         data: sendMoney,
     });
 }));
@@ -61,7 +61,7 @@ const getTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __await
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
-        message: "Retrieve Transaction History successfully",
+        message: "Transaction history retrieved successfully",
         data: getTransaction,
     });
 }));
@@ -71,7 +71,7 @@ const getAllTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __aw
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
-        message: "All Transaction History Retrieved Successfully",
+        message: "All transaction history retrieved successfully",
         data: getAllTransaction,
     });
 }));
@@ -83,7 +83,7 @@ const cashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
-        message: "Cash in successfully",
+        message: "Cash in completed successfully",
         data: result,
     });
 }));
@@ -95,7 +95,7 @@ const cashOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, voi
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
-        message: "Cash-out Successful",
+        message: "Cash-out completed successfully",
         data: result,
     });
 }));

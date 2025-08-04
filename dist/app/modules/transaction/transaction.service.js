@@ -231,10 +231,14 @@ const cashIn = (payload, type, role, agentId) => __awaiter(void 0, void 0, void 
 });
 //agent cash out
 const cashOut = (payload, type, role, agentId) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const session = yield wallet_model_1.Wallet.startSession();
     session.startTransaction();
     try {
         const AGENT_COMMISSION_PERCENT = 1;
+        if (((_a = payload.senderId) === null || _a === void 0 ? void 0 : _a.toString()) === agentId.toString()) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Agent cannot cash-out from self.");
+        }
         const userWallet = yield wallet_model_1.Wallet.findOne({
             user: payload.senderId,
         });

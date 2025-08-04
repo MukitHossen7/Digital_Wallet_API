@@ -26,7 +26,7 @@ const createLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
-        message: "User Login Successfully",
+        message: "User logged in successfully",
         data: userInfo,
     });
 }));
@@ -45,7 +45,7 @@ const logOutUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
-        message: "User Logout Successfully",
+        message: "User logged out successfully",
         data: null,
     });
 }));

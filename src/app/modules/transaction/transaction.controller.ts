@@ -4,7 +4,6 @@ import { TransactionService } from "./transaction.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { PayType } from "./transaction.interface";
-import AppError from "../../errorHelpers/AppError";
 
 // add money
 const addMoney = catchAsync(async (req: Request, res: Response) => {
@@ -123,7 +122,7 @@ const cashOut = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: "Cash-out completed successfully",
+    message: "Cash-out complete Successful",
     data: result,
   });
 });
