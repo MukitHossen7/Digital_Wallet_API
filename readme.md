@@ -10,6 +10,18 @@
 https://digital-wallet-server-nine.vercel.app/
 ```
 
+## Admin And Agent Email, Password
+
+```
+Admin:
+  email: admin@gmail.com,
+  password: Admin123@
+
+Agent:
+ email: mim@gmail.com
+ password: Password@123
+```
+
 ## Features
 
 - JWT-based login and registration
@@ -371,3 +383,28 @@ Request Body:
 
 }
 ```
+
+---
+
+## Dependencies
+
+- "bcryptjs": "^3.0.2",
+- "cookie-parser": "^1.4.7",
+- "cors": "^2.8.5",
+- "dotenv": "^17.2.0",
+- "express": "^5.1.0",
+- "http-status-codes": "^2.3.0",
+- "jsonwebtoken": "^9.0.2",
+- "mongoose": "^8.16.4",
+- "zod": "^3.25.76"
+
+## DevDependencies
+
+- "@types/cookie-parser": "^1.4.9",
+- "@types/cors": "^2.8.19",
+- "@types/express": "^5.0.3",
+- "@types/jsonwebtoken": "^9.0.10",
+- "ts-node-dev": "^2.0.0",
+- "typescript": "^5.8.3"
+
+---
