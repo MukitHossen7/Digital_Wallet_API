@@ -14,13 +14,14 @@ exports.app = (0, express_1.default)();
 //middleware
 exports.app.use((0, cookie_parser_1.default)());
 exports.app.use(express_1.default.json());
+exports.app.set("trust proxy", 1);
 exports.app.use((0, cors_1.default)());
 //routes
 exports.app.use("/api/v1", routes_1.default);
 exports.app.get("/", (req, res) => {
     res.send({
         success: true,
-        message: "This is L2B5 Assignment-5 API",
+        message: "Welcome to the Digital Wallet Server",
     });
 });
 exports.app.use(globalErrorHandler_1.globalErrorHandler);

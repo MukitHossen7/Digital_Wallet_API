@@ -10,12 +10,14 @@ const setAuthCookie = (res, tokenInfo) => {
         res.cookie("accessToken", tokenInfo.accessToken, {
             httpOnly: true,
             secure: config_1.default.NODE_ENV !== "development",
+            sameSite: "none",
         });
     }
     if (tokenInfo.refreshToken) {
         res.cookie("refreshToken", tokenInfo.refreshToken, {
             httpOnly: true,
             secure: config_1.default.NODE_ENV !== "development",
+            sameSite: "none",
         });
     }
 };

@@ -18,13 +18,13 @@ walletRoute.get(
 );
 
 walletRoute.patch(
-  "/:id/block",
+  "/block/:id",
   checkAuth(Role.ADMIN),
   WalletController.blockWallet
 );
 
 walletRoute.patch(
-  "/:id/unblock",
+  "/unblock/:id",
   checkAuth(Role.ADMIN),
   WalletController.unblockWallet
 );

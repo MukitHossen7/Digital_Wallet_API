@@ -179,6 +179,12 @@ const sendMoney = async (
       );
     }
 
+    if (userId === payload.receiverId?.toString()) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You cannot send money to yourself."
+      );
+    }
     await Wallet.findByIdAndUpdate(
       isReceiverWallet._id,
       {
