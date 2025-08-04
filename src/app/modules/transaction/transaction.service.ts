@@ -224,19 +224,7 @@ const sendMoney = async (
 
 //get Transaction History by me
 const getTransactionHistory = async (userId: string) => {
-  // const isWallet = await Wallet.findOne({ user: userId });
-  // if (!isWallet) {
-  //   throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
-  // }
-  // const transactionHistory = await Transaction.find({ wallet: isWallet._id });
-
-  const transactions = await Transaction.find({
-    $or: [{ senderId: userId }, { receiverId: userId }],
-  })
-    .populate("senderId", "name email")
-    .populate("receiverId", "name email")
-    .sort({ createdAt: -1 });
-
+  const transactions = await Transaction.find({ senderId: userId });
   if (transactions.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
   }

@@ -215,8 +215,24 @@ POST /api/v1/auth/logout
 ```
 
 ```json
+Response:
 {
   "success": true,
   "message": "User logged out successfully"
 }
+```
+
+### Wallet Endpoints
+
+#### 1.Get All Wallets (Admin)
+
+```
+GET /api/v1/wallets?role=USER|AGENT
+```
+
+```json
+Response:
+"success": true,
+"message": `All Wallets for role ${role} Retrieved Successfully`,
+"data": wallets,
 ```
