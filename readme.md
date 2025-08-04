@@ -234,5 +234,140 @@ GET /api/v1/wallets?role=USER|AGENT
 Response:
 "success": true,
 "message": `All Wallets for role ${role} Retrieved Successfully`,
-"data": wallets,
+"data": [{}],
+```
+
+#### 2. Get My Wallet (Agent, User)
+
+```
+GET /api/v1/wallets/me
+```
+
+```json
+Response:
+"success": true,
+"message": "Your Wallet Retrieved Successfully",
+"data": {},
+```
+
+#### 3.Block a Wallet (Admin)
+
+```
+PATCH /api/v1/wallets/block/:id
+```
+
+```json
+Response:
+"success": true,
+"message": "Wallet Blocked Successfully",
+```
+
+#### 4.Unblock a Wallet (Admin)
+
+```
+PATCH /api/v1/wallets/unblock/:id
+```
+
+```json
+Response:
+"success": true,
+"message": "Wallet UnBlocked Successfully",
+```
+
+### Transaction Endpoints
+
+#### 1.Add Money (User)
+
+```
+POST /api/v1/transactions/add-money
+```
+
+```json
+Request Body:
+{
+    "amount": 50
+}
+```
+
+#### 2.Withdraw Money (User)
+
+```
+POST /api/v1/transactions/withdraw
+```
+
+```json
+Request Body:
+{
+    "amount": 500
+}
+```
+
+#### 3. Send Money to Another User (User)
+
+```
+POST /api/v1/transactions/send-money
+```
+
+```json
+Request Body:
+{
+    "amount": 100,
+    "receiverId": "688e3cf5dbe9c3cb7b0cd266"
+}
+```
+
+#### 4.Get My Transaction History (User,Agent)
+
+```
+GET /api/v1/transactions/me
+```
+
+```json
+Response:
+"success": true,
+"message": "Transaction history retrieved successfully",
+"data" : [{}]
+```
+
+#### 5.Get All Transactions (Admin)
+
+```
+GET /api/v1/transactions
+```
+
+```json
+Response:
+"success": true,
+"message": "All transaction history retrieved successfully",
+"data" : [{}]
+```
+
+#### 6.Cash-In (Agent)
+
+```
+POST /api/v1/transactions/cash-in
+```
+
+```json
+Request Body:
+{
+    "amount": 50,
+    "receiverId": "688e3cf5dbe9c3cb7b0cd266"
+
+}
+```
+
+#### 7.Cash-Out (Agent)
+
+```
+POST /api/v1/transactions/cash-out
+```
+
+```json
+Request Body:
+{
+    "amount": 2000,
+    "senderId": "688e3cf5dbe9c3cb7b0cd266"
+
+}
 ```
