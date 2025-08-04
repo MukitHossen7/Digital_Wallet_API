@@ -26,6 +26,7 @@ Agent:
 
 - JWT-based login and registration
 - Role-based access control (`admin`, `agent`, `user`)
+- Admin can retrieve all transaction history with support for pagination, sorting (by fields like amount, date), and filtering (by transaction type, status, user, etc.)
 - Automatic wallet creation on registration.
 - Add money, withdraw, send money, and view transaction history
 - Agents can perform cash-in/out for users
@@ -343,8 +344,12 @@ Response:
 
 #### 5.Get All Transactions (Admin)
 
+Admin can retrieve all transaction history with support for pagination, sorting (by fields like amount, date), and filtering (by transaction type, status, user, etc.)
+
 ```
 GET /api/v1/transactions
+
+GET/api/v1/transactions?type=ADD_MONEY&page=1&sort=-amount&limit=5
 ```
 
 ```json

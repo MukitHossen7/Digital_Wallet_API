@@ -8,11 +8,13 @@ const getAllWalletsByRole = async (role: string) => {
   if (role !== Role.USER && role !== Role.AGENT) {
     throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
   }
-  const wallets = await Wallet.find().populate({
-    path: "user",
-    match: { role: role },
-    select: "name email role",
-  });
+  const wallets = await Wallet.find()
+    .sort("-createdAt")
+    .populate({
+      path: "user",
+      match: { role: role },
+      select: "name email role",
+    });
   const filterWallets = wallets.filter((wallet) => wallet.user);
   return filterWallets;
 };

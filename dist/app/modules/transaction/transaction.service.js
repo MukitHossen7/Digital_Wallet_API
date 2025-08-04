@@ -153,17 +153,7 @@ const sendMoney = (payload, type, role, userId) => __awaiter(void 0, void 0, voi
 });
 //get Transaction History by me
 const getTransactionHistory = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // const isWallet = await Wallet.findOne({ user: userId });
-    // if (!isWallet) {
-    //   throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
-    // }
-    // const transactionHistory = await Transaction.find({ wallet: isWallet._id });
-    const transactions = yield transaction_model_1.Transaction.find({
-        $or: [{ senderId: userId }, { receiverId: userId }],
-    })
-        .populate("senderId", "name email")
-        .populate("receiverId", "name email")
-        .sort({ createdAt: -1 });
+    const transactions = yield transaction_model_1.Transaction.find({ senderId: userId });
     if (transactions.length === 0) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "No transaction history found");
     }

@@ -67,7 +67,7 @@ const getAllUserOrAgent = async (role: string) => {
   if (role !== Role.USER && role !== Role.AGENT) {
     throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
   }
-  const users = await User.find({ role: role });
+  const users = await User.find({ role: role }).sort("-createdAt");
   return users;
 };
 
