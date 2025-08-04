@@ -92,6 +92,7 @@ const withdrawMoney = (payload, type, role, userId) => __awaiter(void 0, void 0,
 });
 // send money
 const sendMoney = (payload, type, role, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const session = yield wallet_model_1.Wallet.startSession();
     session.startTransaction();
     try {
@@ -117,6 +118,9 @@ const sendMoney = (payload, type, role, userId) => __awaiter(void 0, void 0, voi
         }
         if (isReceiverWallet.isBlocked === true) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "This wallet is blocked. No transaction is allowed.");
+        }
+        if (userId === ((_a = payload.receiverId) === null || _a === void 0 ? void 0 : _a.toString())) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "You cannot send money to yourself.");
         }
         yield wallet_model_1.Wallet.findByIdAndUpdate(isReceiverWallet._id, {
             $set: {

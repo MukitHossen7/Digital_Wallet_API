@@ -341,6 +341,12 @@ const cashOut = async (
   session.startTransaction();
   try {
     const AGENT_COMMISSION_PERCENT = 1;
+    if (payload.senderId?.toString() === agentId.toString()) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Agent cannot cash-out from self."
+      );
+    }
     const userWallet = await Wallet.findOne({
       user: payload.senderId,
     });

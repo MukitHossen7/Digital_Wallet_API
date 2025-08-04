@@ -15,7 +15,7 @@ const createLogin = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "User Login Successfully",
+      message: "User logged in successfully",
       data: userInfo,
     });
   }
@@ -37,7 +37,7 @@ const logOutUser = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "User Logout Successfully",
+      message: "User logged out successfully",
       data: null,
     });
   }

@@ -58,7 +58,7 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: "Send Money successfully",
+    message: "Money sent successfully",
     data: sendMoney,
   });
 });
@@ -74,7 +74,7 @@ const getTransactionHistory = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Retrieve Transaction History successfully",
+      message: "Transaction history retrieved successfully",
       data: getTransaction,
     });
   }
@@ -89,7 +89,7 @@ const getAllTransactionHistory = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "All Transaction History Retrieved Successfully",
+      message: "All transaction history retrieved successfully",
       data: getAllTransaction,
     });
   }
@@ -104,7 +104,7 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: "Cash in successfully",
+    message: "Cash in completed successfully",
     data: result,
   });
 });
@@ -123,7 +123,7 @@ const cashOut = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: "Cash-out Successful",
+    message: "Cash-out completed successfully",
     data: result,
   });
 });

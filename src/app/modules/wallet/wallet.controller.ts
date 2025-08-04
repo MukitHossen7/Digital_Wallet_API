@@ -10,7 +10,10 @@ import AppError from "../../errorHelpers/AppError";
 const getAllWalletsByRole = catchAsync(async (req: Request, res: Response) => {
   const role = req.query.role as string;
   if (!role) {
-    throw new AppError(400, "Role query parameter is required");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Role query parameter is required"
+    );
   }
   const wallets = await WalletServices.getAllWalletsByRole(role.toUpperCase());
   sendResponse(res, {
