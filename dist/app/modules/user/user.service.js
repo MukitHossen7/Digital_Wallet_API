@@ -70,7 +70,7 @@ const getAllUserOrAgent = (role) => __awaiter(void 0, void 0, void 0, function* 
     if (role !== user_interface_1.Role.USER && role !== user_interface_1.Role.AGENT) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `Invalid role: ${role}`);
     }
-    const users = yield user_model_1.User.find({ role: role });
+    const users = yield user_model_1.User.find({ role: role }).sort("-createdAt");
     return users;
 });
 const approveAgent = (id) => __awaiter(void 0, void 0, void 0, function* () {

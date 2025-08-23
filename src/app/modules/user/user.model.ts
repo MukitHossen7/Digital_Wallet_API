@@ -1,5 +1,22 @@
 import { model, Schema } from "mongoose";
-import { IsActive, IUser, Role } from "./user.interface";
+import { IAuthsProviders, IsActive, IUser, Role } from "./user.interface";
+
+const authsSchema = new Schema<IAuthsProviders>(
+  {
+    provider: {
+      type: String,
+      required: true,
+    },
+    providerID: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    versionKey: false,
+    _id: false,
+  }
+);
 
 const userSchema = new Schema<IUser>(
   {
@@ -16,13 +33,10 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, "name is required"],
       trim: true,
     },
     phone: {
       type: String,
-      required: [true, "name is required"],
-      unique: true,
       trim: true,
     },
     picture: {
@@ -34,6 +48,10 @@ const userSchema = new Schema<IUser>(
       trim: true,
     },
     isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
       type: Boolean,
       default: false,
     },
@@ -50,6 +68,7 @@ const userSchema = new Schema<IUser>(
     commissionRate: {
       type: Number,
     },
+    auths: [authsSchema],
   },
   { versionKey: false, timestamps: true }
 );

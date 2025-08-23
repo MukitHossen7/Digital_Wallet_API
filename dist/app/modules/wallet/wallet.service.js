@@ -22,7 +22,9 @@ const getAllWalletsByRole = (role) => __awaiter(void 0, void 0, void 0, function
     if (role !== user_interface_1.Role.USER && role !== user_interface_1.Role.AGENT) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `Invalid role: ${role}`);
     }
-    const wallets = yield wallet_model_1.Wallet.find().populate({
+    const wallets = yield wallet_model_1.Wallet.find()
+        .sort("-createdAt")
+        .populate({
         path: "user",
         match: { role: role },
         select: "name email role",

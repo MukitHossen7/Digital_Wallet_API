@@ -11,7 +11,7 @@ export const checkAuth =
   (...authRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const accessToken = req.headers.authorization;
+      const accessToken = req.headers.authorization || req.cookies.accessToken;
 
       if (!accessToken) {
         throw new AppError(httpStatus.FORBIDDEN, "Access token is missing");
@@ -30,6 +30,12 @@ export const checkAuth =
         throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist");
       }
 
+      if (isExistUser.isVerified === !true) {
+        throw new AppError(
+          httpStatus.FORBIDDEN,
+          "Your account is not verified"
+        );
+      }
       if (isExistUser.isDeleted === true) {
         throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
       }

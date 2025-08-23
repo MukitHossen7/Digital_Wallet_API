@@ -18,6 +18,7 @@ const transaction_service_1 = require("./transaction.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const transaction_interface_1 = require("./transaction.interface");
+const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 // add money
 const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.ADD_MONEY;
@@ -67,12 +68,18 @@ const getTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __await
 }));
 //get Transaction History by admin
 const getAllTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const getAllTransaction = yield transaction_service_1.TransactionService.getAllTransactionHistory();
+    // const getAllTransaction =
+    //   await TransactionService.getAllTransactionHistory();
+    const transactionHistory = res.locals.data;
+    if (transactionHistory.data.length === 0) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "No transaction history found");
+    }
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "All transaction history retrieved successfully",
-        data: getAllTransaction,
+        meta: transactionHistory.meta,
+        data: transactionHistory.data,
     });
 }));
 //cash in Agent
