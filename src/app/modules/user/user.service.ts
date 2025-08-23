@@ -1,5 +1,5 @@
 import AppError from "../../errorHelpers/AppError";
-import { IsActive, IUser, Role } from "./user.interface";
+import { IAuthsProviders, IsActive, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcrypt from "bcryptjs";
@@ -17,6 +17,10 @@ const createUser = async (payload: Partial<IUser>) => {
       throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist");
     }
 
+    const authProvider: IAuthsProviders = {
+      provider: "credential",
+      providerID: email as string,
+    };
     const hashPassword = await bcrypt.hash(
       password as string,
       Number(config.BCRYPT_SALT_ROUNDS)
@@ -26,6 +30,7 @@ const createUser = async (payload: Partial<IUser>) => {
         {
           email,
           password: hashPassword,
+          auths: [authProvider],
           ...rest,
         },
       ],

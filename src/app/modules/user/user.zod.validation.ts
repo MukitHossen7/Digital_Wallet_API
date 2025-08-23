@@ -35,4 +35,5 @@ export const createUserZodSchema = z.object({
   picture: z
     .string({ invalid_type_error: "Picture must be string" })
     .optional(),
+  role: z.enum(["USER", "AGENT"]).optional(),
 });
