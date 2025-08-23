@@ -59,7 +59,23 @@ const logOutUser = catchAsync(
   }
 );
 
+const googleLogin = catchAsync(async (req: Request, res: Response) => {
+  let redirectUrl = req.query.state ? (req.query.state as string) : "";
+  if (redirectUrl.startsWith("/")) {
+    redirectUrl = redirectUrl.slice(1);
+  }
+  const user = req.user;
+
+  if (!user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated");
+  }
+  const tokenInfo = createUserTokens(user);
+  setAuthCookie(res, tokenInfo);
+  res.redirect(`${config.FRONTEND_URL}/${redirectUrl}`);
+});
+
 export const AuthController = {
   createLogin,
   logOutUser,
+  googleLogin,
 };

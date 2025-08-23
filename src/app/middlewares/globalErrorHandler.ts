@@ -23,7 +23,7 @@ export const globalErrorHandler = (
   if (error.code === 11000) {
     const matchArray = error.message.match(/"([^"]*)"/);
     statusCode = 400;
-    message = `${matchArray[1]} already exists!!`;
+    message = `${matchArray?.[1] || "Field"} already exists!!`;
   }
   // cast error
   else if (error.name === "CastError") {

@@ -14,7 +14,7 @@ export const app = express();
 
 app.use(
   expressSession({
-    secret: "your secret",
+    secret: config.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })
