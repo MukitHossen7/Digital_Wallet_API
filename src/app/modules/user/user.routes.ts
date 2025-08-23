@@ -15,6 +15,8 @@ userRoute.post(
 
 userRoute.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUserOrAgent);
 
+userRoute.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
+
 userRoute.patch(
   "/approve/:id",
   checkAuth(Role.ADMIN),

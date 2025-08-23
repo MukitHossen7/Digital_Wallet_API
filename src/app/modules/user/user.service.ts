@@ -106,9 +106,15 @@ const suspendAgent = async (id: string) => {
   await user.save();
   return user;
 };
+
+const getMe = async (id: string) => {
+  const user = await User.findById(id).select("-password");
+  return user;
+};
 export const UserServices = {
   createUser,
   approveAgent,
   suspendAgent,
   getAllUserOrAgent,
+  getMe,
 };
