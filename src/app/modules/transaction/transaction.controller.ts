@@ -5,11 +5,12 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 import { PayType } from "./transaction.interface";
 import AppError from "../../errorHelpers/AppError";
+import { JwtPayload } from "jsonwebtoken";
 
 // add money
 const addMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.ADD_MONEY;
-  const { role, id: userId } = req.user;
+  const { role, id: userId } = req.user as JwtPayload;
   const addMoney = await TransactionService.addMoney(
     req.body,
     type,
@@ -28,7 +29,7 @@ const addMoney = catchAsync(async (req: Request, res: Response) => {
 //withdraw Money
 const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.WITHDRAW;
-  const { role, id: userId } = req.user;
+  const { role, id: userId } = req.user as JwtPayload;
   const withdrawMoney = await TransactionService.withdrawMoney(
     req.body,
     type,
@@ -47,7 +48,7 @@ const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
 //send Money
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.SEND_MONEY;
-  const { role, id: userId } = req.user;
+  const { role, id: userId } = req.user as JwtPayload;
   const sendMoney = await TransactionService.sendMoney(
     req.body,
     type,
@@ -66,7 +67,7 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
 //get Transaction History by me
 const getTransactionHistory = catchAsync(
   async (req: Request, res: Response) => {
-    const { id: userId } = req.user;
+    const { id: userId } = req.user as JwtPayload;
     const getTransaction = await TransactionService.getTransactionHistory(
       userId
     );
@@ -102,7 +103,7 @@ const getAllTransactionHistory = catchAsync(
 //cash in Agent
 const cashIn = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.ADD_MONEY;
-  const { role, id: agentId } = req.user;
+  const { role, id: agentId } = req.user as JwtPayload;
   const result = await TransactionService.cashIn(req.body, type, role, agentId);
 
   sendResponse(res, {
@@ -116,7 +117,7 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
 //cash out Agent
 const cashOut = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.WITHDRAW;
-  const { role, id: agentId } = req.user;
+  const { role, id: agentId } = req.user as JwtPayload;
   const result = await TransactionService.cashOut(
     req.body,
     type,

@@ -27,4 +27,5 @@ export interface ITransaction {
   fee?: number;
   commission?: number;
   status: PayStatus;
+  email?: string;
 }

@@ -6,6 +6,7 @@ import { Transaction } from "./transaction.model";
 import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
 import { calculateBySendMoneyFee } from "../../utils/calculateBySendMoneyFee";
 import { Role } from "../user/user.interface";
+import { User } from "../user/user.model";
 
 // add money
 const addMoney = async (
@@ -17,6 +18,7 @@ const addMoney = async (
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
+    console.log(payload);
     const isWallet = await Wallet.findOne({
       user: userId,
     });
@@ -167,8 +169,11 @@ const sendMoney = async (
       },
       { new: true, runValidators: true, session }
     );
-
-    const isReceiverWallet = await Wallet.findOne({ user: payload.receiverId });
+    const isReceiverUser = await User.findOne({ email: payload.email });
+    if (!isReceiverUser) {
+      throw new AppError(httpStatus.NOT_FOUND, "Receiver email not found");
+    }
+    const isReceiverWallet = await Wallet.findOne({ user: isReceiverUser._id });
     if (!isReceiverWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "Receiver wallet not found");
     }
@@ -179,7 +184,7 @@ const sendMoney = async (
       );
     }
 
-    if (userId === payload.receiverId?.toString()) {
+    if (userId === isReceiverUser?._id.toString()) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "You cannot send money to yourself."
@@ -204,7 +209,7 @@ const sendMoney = async (
           wallet: isSenderWallet._id,
           fee,
           senderId: userId,
-          receiverId: payload.receiverId,
+          receiverId: isReceiverUser._id,
           status: PayStatus.COMPLETED,
         },
       ],

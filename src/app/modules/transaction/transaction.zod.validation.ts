@@ -14,6 +14,7 @@ export const createTransactionZodSchema = z.object({
     .nonnegative(),
 
   senderId: z.string().optional(),
+  email: z.string().optional(),
   receiverId: z.string().optional(),
   wallet: z.string().optional(),
   initiatedBy: z.enum([InitiatedBy.USER, InitiatedBy.AGENT]).optional(),

@@ -44,6 +44,9 @@ const transactionSchema = new Schema<ITransaction>(
       type: Number,
       default: 0,
     },
+    email: {
+      type: String,
+    },
     status: {
       type: String,
       enum: Object.values(PayStatus),
