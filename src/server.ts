@@ -3,6 +3,7 @@ import config from "./app/config";
 import mongoose from "mongoose";
 import { app } from "./app";
 import { seedAdmin } from "./app/utils/seedAdmin";
+import { connectRedis } from "./app/config/redis.config";
 
 let server: Server;
 
@@ -22,6 +23,7 @@ const A5Server = async () => {
   }
 };
 (async () => {
+  await connectRedis();
   await A5Server();
   await seedAdmin();
 })();

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+        padding: 20px;
+        text-align: center;
+      }
+      .otp-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .otp-code {
+        font-size: 32px;
+        font-weight: bold;
+        color: #2b7cff;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="otp-container">
+      <h2>Hello <%= name %>,</h2>
+      <p>Your One-Time Password (OTP) is:</p>
+      <div class="otp-code"><%= otp %></div>
+      <p>
+        This OTP is valid for only 2 minutes. Please do not share it with
+        anyone.
+      </p>
+    </div>
+  </body>
+</html>
