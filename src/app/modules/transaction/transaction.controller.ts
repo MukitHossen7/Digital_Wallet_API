@@ -3,20 +3,20 @@ import { catchAsync } from "../../utils/catchAsync";
 import { TransactionService } from "./transaction.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
-import { PayType } from "./transaction.interface";
+import { ITransaction, PayType } from "./transaction.interface";
 import AppError from "../../errorHelpers/AppError";
 import { JwtPayload } from "jsonwebtoken";
 
 // add money
 const addMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.ADD_MONEY;
+  const payload = req.body;
+  if (type !== payload.type) {
+    throw new AppError(400, "Transaction type mismatch. Please try again.");
+  }
   const { role, id: userId } = req.user as JwtPayload;
-  const addMoney = await TransactionService.addMoney(
-    req.body,
-    type,
-    role,
-    userId
-  );
+
+  const addMoney = await TransactionService.addMoney(payload, role, userId);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -29,10 +29,13 @@ const addMoney = catchAsync(async (req: Request, res: Response) => {
 //withdraw Money
 const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.WITHDRAW;
+  const payload = req.body;
+  if (type !== payload.type) {
+    throw new AppError(400, "Transaction type mismatch. Please try again.");
+  }
   const { role, id: userId } = req.user as JwtPayload;
   const withdrawMoney = await TransactionService.withdrawMoney(
-    req.body,
-    type,
+    payload,
     role,
     userId
   );
@@ -48,13 +51,12 @@ const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
 //send Money
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.SEND_MONEY;
+  const payload = req.body;
+  if (type !== payload.type) {
+    throw new AppError(400, "Transaction type mismatch. Please try again.");
+  }
   const { role, id: userId } = req.user as JwtPayload;
-  const sendMoney = await TransactionService.sendMoney(
-    req.body,
-    type,
-    role,
-    userId
-  );
+  const sendMoney = await TransactionService.sendMoney(payload, role, userId);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

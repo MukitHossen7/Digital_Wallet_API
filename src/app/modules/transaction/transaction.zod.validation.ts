@@ -12,8 +12,6 @@ export const createTransactionZodSchema = z.object({
     })
     .min(50, "Minimum transaction amount is ৳50")
     .nonnegative(),
-
-  senderId: z.string().optional(),
   email: z.string().optional(),
   receiverId: z.string().optional(),
   wallet: z.string().optional(),

@@ -11,14 +11,32 @@ import { User } from "../user/user.model";
 // add money
 const addMoney = async (
   payload: ITransaction,
-  type: string,
   role: string,
   userId: string
 ) => {
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
-    console.log(payload);
+    const isAgent = await User.findOne({
+      email: payload.email,
+      role: Role.AGENT,
+    });
+    if (!isAgent) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
+    }
+    const isAgentWallet = await Wallet.findOne({ user: isAgent._id });
+    if (!isAgentWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent wallet not found");
+    }
+    if (isAgentWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
+    if (isAgentWallet.balance < payload.amount) {
+      throw new AppError(400, "Insufficient balance in agent wallet.");
+    }
     const isWallet = await Wallet.findOne({
       user: userId,
     });
@@ -31,23 +49,28 @@ const addMoney = async (
         "This wallet is blocked. No transaction is allowed."
       );
     }
-    await Wallet.findByIdAndUpdate(
-      isWallet._id,
-      {
-        $set: {
-          balance: isWallet.balance + payload.amount,
-        },
-      },
+    await Wallet.updateOne(
+      { _id: isWallet._id },
+
+      { $inc: { balance: payload.amount } },
+
+      { new: true, runValidators: true, session }
+    );
+
+    await Wallet.updateOne(
+      { _id: isAgentWallet._id },
+      { $inc: { balance: -payload.amount } },
       { new: true, runValidators: true, session }
     );
 
     const addMoneyTransaction = await Transaction.create(
       [
         {
-          ...payload,
-          type,
+          amount: payload.amount,
+          type: payload.type,
           wallet: isWallet._id,
-          senderId: userId,
+          senderId: isAgent._id,
+          receiverId: userId,
           initiatedBy: role,
           status: PayStatus.COMPLETED,
         },
@@ -69,13 +92,29 @@ const addMoney = async (
 // with draw money
 const withdrawMoney = async (
   payload: ITransaction,
-  type: string,
   role: string,
   userId: string
 ) => {
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
+    const isAgent = await User.findOne({
+      email: payload.email,
+      role: Role.AGENT,
+    });
+    if (!isAgent) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
+    }
+    const isAgentWallet = await Wallet.findOne({ user: isAgent._id });
+    if (!isAgentWallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "Agent wallet not found");
+    }
+    if (isAgentWallet.isBlocked === true) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "This wallet is blocked. No transaction is allowed."
+      );
+    }
     const isWallet = await Wallet.findOne({ user: userId });
     if (!isWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
@@ -86,12 +125,11 @@ const withdrawMoney = async (
         "This wallet is blocked. No transaction is allowed."
       );
     }
-    const { totalAmount, fee } = calculateTotalWithFee(payload.amount);
 
-    if (isWallet.balance < totalAmount) {
+    if (isWallet.balance < payload?.amount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `Insufficient balance. Your balance is ${isWallet.balance}, but you need ${totalAmount} including transaction charges.`
+        `Insufficient balance. Your balance is ${isWallet.balance}, but you need ${payload?.amount} including transaction charges.`
       );
     }
 
@@ -99,21 +137,31 @@ const withdrawMoney = async (
       isWallet._id,
       {
         $set: {
-          balance: isWallet.balance - totalAmount,
+          balance: isWallet.balance - payload?.amount,
         },
       },
       { new: true, runValidators: true, session }
     );
-
+    const agentBalance = payload.amount - (payload?.fee || 0);
+    await Wallet.findByIdAndUpdate(
+      isAgentWallet._id,
+      {
+        $set: {
+          balance: isAgentWallet.balance + agentBalance,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
     const withdrawMoneyTransaction = await Transaction.create(
       [
         {
-          ...payload,
-          type,
+          amount: payload.amount,
+          type: payload.type,
           initiatedBy: role,
           wallet: isWallet._id,
           senderId: userId,
-          fee,
+          receiverId: isAgent._id,
+          fee: payload.fee,
           status: PayStatus.COMPLETED,
         },
       ],
@@ -134,7 +182,6 @@ const withdrawMoney = async (
 // send money
 const sendMoney = async (
   payload: ITransaction,
-  type: string,
   role: string,
   userId: string
 ) => {
@@ -151,28 +198,19 @@ const sendMoney = async (
         "This wallet is blocked. No transaction is allowed."
       );
     }
-    const { totalAmount, fee } = calculateBySendMoneyFee(payload.amount);
+    // const { totalAmount, fee } = calculateBySendMoneyFee(payload.amount);
 
-    if (isSenderWallet.balance < totalAmount) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        `Insufficient balance: Your wallet balance is ${isSenderWallet.balance}, but you need ${totalAmount} including fees to send money.`
-      );
-    }
-
-    await Wallet.findByIdAndUpdate(
-      isSenderWallet._id,
-      {
-        $set: {
-          balance: isSenderWallet.balance - totalAmount,
-        },
-      },
-      { new: true, runValidators: true, session }
-    );
     const isReceiverUser = await User.findOne({ email: payload.email });
     if (!isReceiverUser) {
       throw new AppError(httpStatus.NOT_FOUND, "Receiver email not found");
     }
+    if (userId === isReceiverUser?._id.toString()) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You cannot send money to yourself."
+      );
+    }
+
     const isReceiverWallet = await Wallet.findOne({ user: isReceiverUser._id });
     if (!isReceiverWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "Receiver wallet not found");
@@ -184,17 +222,29 @@ const sendMoney = async (
       );
     }
 
-    if (userId === isReceiverUser?._id.toString()) {
+    if (isSenderWallet.balance < payload.amount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "You cannot send money to yourself."
+        `Insufficient balance: Your wallet balance is ${isSenderWallet.balance}, but you need ${payload.amount} including fees to send money.`
       );
     }
+
+    await Wallet.findByIdAndUpdate(
+      isSenderWallet._id,
+      {
+        $set: {
+          balance: isSenderWallet.balance - payload.amount,
+        },
+      },
+      { new: true, runValidators: true, session }
+    );
+
+    const receiverAmount = payload.amount - (payload.fee ?? 0);
     await Wallet.findByIdAndUpdate(
       isReceiverWallet._id,
       {
         $set: {
-          balance: isReceiverWallet.balance + payload.amount,
+          balance: isReceiverWallet.balance + receiverAmount,
         },
       },
       { new: true, runValidators: true, session }
@@ -204,10 +254,10 @@ const sendMoney = async (
       [
         {
           amount: payload.amount,
-          type,
+          type: payload.type,
           initiatedBy: role,
           wallet: isSenderWallet._id,
-          fee,
+          fee: payload.fee,
           senderId: userId,
           receiverId: isReceiverUser._id,
           status: PayStatus.COMPLETED,
