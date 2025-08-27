@@ -141,6 +141,21 @@ const cashOut = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//cash out Agent
+const getTransactionSummary = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id: agentId } = req.user as JwtPayload;
+    const result = await TransactionService.getTransactionSummary(agentId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Get Agent Summary Successfully",
+      data: result,
+    });
+  }
+);
+
 export const TransactionController = {
   addMoney,
   withdrawMoney,
@@ -149,4 +164,5 @@ export const TransactionController = {
   getAllTransactionHistory,
   cashIn,
   cashOut,
+  getTransactionSummary,
 };

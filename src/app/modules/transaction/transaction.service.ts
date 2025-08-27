@@ -7,6 +7,7 @@ import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
 import { calculateBySendMoneyFee } from "../../utils/calculateBySendMoneyFee";
 import { Role } from "../user/user.interface";
 import { User } from "../user/user.model";
+import mongoose from "mongoose";
 
 // add money
 const addMoney = async (
@@ -200,7 +201,10 @@ const sendMoney = async (
     }
     // const { totalAmount, fee } = calculateBySendMoneyFee(payload.amount);
 
-    const isReceiverUser = await User.findOne({ email: payload.email });
+    const isReceiverUser = await User.findOne({
+      email: payload.email,
+      role: Role.USER,
+    });
     if (!isReceiverUser) {
       throw new AppError(httpStatus.NOT_FOUND, "Receiver email not found");
     }
@@ -525,6 +529,72 @@ const cashOut = async (
   }
 };
 
+const getTransactionSummary = async (agentId: string) => {
+  const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const last7DaysSummaryPromise = Transaction.aggregate([
+    {
+      $match: {
+        $or: [
+          { senderId: new mongoose.Types.ObjectId(agentId) },
+          { receiverId: new mongoose.Types.ObjectId(agentId) },
+        ],
+        createdAt: { $gte: last7Days },
+        status: "COMPLETED",
+      },
+    },
+    {
+      $group: {
+        _id: "$type",
+        totalAmount: { $sum: "$amount" },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const weeklyGraphPromise = Transaction.aggregate([
+    {
+      $match: {
+        $or: [
+          { senderId: new mongoose.Types.ObjectId(agentId) },
+          { receiverId: new mongoose.Types.ObjectId(agentId) },
+        ],
+        status: "COMPLETED",
+        createdAt: { $gte: last7Days },
+      },
+    },
+    {
+      $project: {
+        type: 1,
+        amount: 1,
+        day: { $dayOfWeek: "$createdAt" },
+      },
+    },
+    {
+      $group: {
+        _id: { day: "$day", type: "$type" },
+        total: { $sum: "$amount" },
+      },
+    },
+  ]);
+  const recentActivityPromise = Transaction.find({
+    $or: [{ senderId: agentId }, { receiverId: agentId }],
+  })
+    .sort({ createdAt: -1 })
+    .limit(10);
+
+  const [last7DaysSummary, weeklyGraph, recentActivity] = await Promise.all([
+    last7DaysSummaryPromise,
+    weeklyGraphPromise,
+    recentActivityPromise,
+  ]);
+  return {
+    last7DaysSummary,
+    weeklyGraph,
+    recentActivity,
+  };
+};
+
 export const TransactionService = {
   addMoney,
   withdrawMoney,
@@ -533,4 +603,5 @@ export const TransactionService = {
   getAllTransactionHistory,
   cashIn,
   cashOut,
+  getTransactionSummary,
 };

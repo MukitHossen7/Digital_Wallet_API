@@ -37,6 +37,12 @@ transactionRoute.get(
 );
 
 transactionRoute.get(
+  "/summary",
+  checkAuth(Role.AGENT),
+  TransactionController.getTransactionSummary
+);
+
+transactionRoute.get(
   "/",
   checkAuth(Role.ADMIN),
   queryBuilders(Transaction),
