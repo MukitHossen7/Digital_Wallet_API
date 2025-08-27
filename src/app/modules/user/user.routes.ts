@@ -13,7 +13,11 @@ userRoute.post(
   UserControllers.createUser
 );
 
-userRoute.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUserOrAgent);
+userRoute.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.AGENT),
+  UserControllers.getAllUserOrAgent
+);
 
 userRoute.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
 

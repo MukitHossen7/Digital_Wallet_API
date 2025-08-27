@@ -108,8 +108,12 @@ const getAllTransactionHistory = catchAsync(
 //cash in Agent
 const cashIn = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.ADD_MONEY;
+  const payload = req.body;
+  if (type !== payload.type) {
+    throw new AppError(400, "Transaction type mismatch. Please try again.");
+  }
   const { role, id: agentId } = req.user as JwtPayload;
-  const result = await TransactionService.cashIn(req.body, type, role, agentId);
+  const result = await TransactionService.cashIn(payload, role, agentId);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -122,13 +126,12 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
 //cash out Agent
 const cashOut = catchAsync(async (req: Request, res: Response) => {
   const type = PayType.WITHDRAW;
+  const payload = req.body;
+  if (type !== payload.type) {
+    throw new AppError(400, "Transaction type mismatch. Please try again.");
+  }
   const { role, id: agentId } = req.user as JwtPayload;
-  const result = await TransactionService.cashOut(
-    req.body,
-    type,
-    role,
-    agentId
-  );
+  const result = await TransactionService.cashOut(payload, role, agentId);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

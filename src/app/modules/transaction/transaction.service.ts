@@ -349,17 +349,16 @@ const getAllTransactionHistory = async () => {
 };
 
 //agent cash in
-const cashIn = async (
-  payload: ITransaction,
-  type: string,
-  role: string,
-  agentId: string
-) => {
+const cashIn = async (payload: ITransaction, role: string, agentId: string) => {
   const session = await Wallet.startSession();
   session.startTransaction();
   try {
     const AGENT_COMMISSION_PERCENT = 1;
-    const userWallet = await Wallet.findOne({ user: payload.receiverId });
+    const isUser = await User.findOne({ email: payload.email, role: "USER" });
+    if (!isUser) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+    const userWallet = await Wallet.findOne({ user: isUser._id });
     if (!userWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
     }
@@ -404,9 +403,9 @@ const cashIn = async (
       [
         {
           amount: payload.amount,
-          type,
+          type: payload.type,
           senderId: agentId,
-          receiverId: payload.receiverId,
+          receiverId: isUser._id,
           wallet: userWallet._id,
           initiatedBy: role,
           commission,
@@ -429,7 +428,6 @@ const cashIn = async (
 //agent cash out
 const cashOut = async (
   payload: ITransaction,
-  type: string,
   role: string,
   agentId: string
 ) => {
@@ -437,14 +435,18 @@ const cashOut = async (
   session.startTransaction();
   try {
     const AGENT_COMMISSION_PERCENT = 1;
-    if (payload.senderId?.toString() === agentId.toString()) {
+    const isUser = await User.findOne({ email: payload.email, role: "USER" });
+    if (!isUser) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+    if (isUser._id.toString() === agentId.toString()) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "Agent cannot cash-out from self."
       );
     }
     const userWallet = await Wallet.findOne({
-      user: payload.senderId,
+      user: isUser._id,
     });
     if (!userWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
@@ -455,12 +457,12 @@ const cashOut = async (
         "User wallet is blocked. No transaction is allowed."
       );
     }
-    const { totalAmount, fee } = calculateTotalWithFee(payload?.amount);
+    // const { totalAmount, fee } = calculateTotalWithFee(payload?.amount);
 
-    if (userWallet.balance < totalAmount) {
+    if (userWallet.balance < payload.amount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `Insufficient balance. Your balance is ${userWallet.balance}, but you need ${totalAmount} including transaction charges.`
+        `Insufficient balance. Your balance is ${userWallet.balance}, but you need ${payload.amount} including transaction charges.`
       );
     }
 
@@ -468,7 +470,7 @@ const cashOut = async (
       userWallet._id,
       {
         $inc: {
-          balance: -totalAmount,
+          balance: -payload?.amount,
         },
       },
       { new: true, runValidators: true, session }
@@ -484,27 +486,28 @@ const cashOut = async (
         "Agent wallet is blocked. No transaction is allowed."
       );
     }
+    const agentAmount = payload.amount - (payload?.fee ?? 0);
     await Wallet.findByIdAndUpdate(
       agentWallet._id,
       {
         $set: {
-          balance: agentWallet.balance + payload.amount,
+          balance: agentWallet.balance + agentAmount,
         },
       },
       { new: true, runValidators: true, session }
     );
-    const commission = (AGENT_COMMISSION_PERCENT / 100) * payload.amount;
+    const commission = (AGENT_COMMISSION_PERCENT / 100) * agentAmount;
     const cashOutTransaction = await Transaction.create(
       [
         {
           amount: payload.amount,
-          type,
-          senderId: payload.senderId,
+          type: payload.type,
+          senderId: isUser._id,
           receiverId: agentId,
           wallet: userWallet._id,
           initiatedBy: role,
           commission,
-          fee,
+          fee: payload.fee,
           status: PayStatus.COMPLETED,
         },
       ],
