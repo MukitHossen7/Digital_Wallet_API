@@ -69,16 +69,19 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
 //get Transaction History by me
 const getTransactionHistory = catchAsync(
   async (req: Request, res: Response) => {
+    const query = req.query;
     const { id: userId } = req.user as JwtPayload;
     const getTransaction = await TransactionService.getTransactionHistory(
-      userId
+      userId,
+      query
     );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Transaction history retrieved successfully",
-      data: getTransaction,
+      meta: getTransaction.meta,
+      data: getTransaction.transactions,
     });
   }
 );

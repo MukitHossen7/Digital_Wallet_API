@@ -278,12 +278,65 @@ const sendMoney = async (
 };
 
 //get Transaction History by me
-const getTransactionHistory = async (userId: string) => {
-  const transactions = await Transaction.find({ senderId: userId });
-  if (transactions.length === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
+const getTransactionHistory = async (userId: string, query: any) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  const sort = (query.sort as string) || "-createdAt";
+
+  const filter: any = {
+    $or: [{ senderId: userId }, { receiverId: userId }],
+  };
+
+  if (query.type && query.type !== "all") {
+    filter.type = query.type;
   }
-  return transactions;
+
+  if (query.fromDate || query.toDate) {
+    filter.createdAt = {};
+
+    if (query.fromDate) {
+      const from = new Date(query.fromDate);
+      from.setHours(0, 0, 0, 0);
+      filter.createdAt.$gte = from;
+    }
+
+    if (query.toDate) {
+      // toDate পর্যন্ত day end
+      const to = new Date(query.toDate);
+      to.setHours(23, 59, 59, 999);
+      filter.createdAt.$lte = to;
+    }
+  }
+  const transactions = await Transaction.find(filter)
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+
+  const totalDocuments = await Transaction.countDocuments(filter);
+  const totalPage = Math.ceil(totalDocuments / limit);
+
+  if (transactions.length === 0) {
+    return {
+      meta: {
+        page,
+        limit,
+        totalPage: 0,
+        total: 0,
+      },
+      transactions: [],
+    };
+  }
+
+  return {
+    meta: {
+      page,
+      limit,
+      totalPage,
+      total: totalDocuments,
+    },
+    transactions,
+  };
 };
 
 //get Transaction History
