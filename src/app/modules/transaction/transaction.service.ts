@@ -581,7 +581,7 @@ const getTransactionSummary = async (agentId: string) => {
     $or: [{ senderId: agentId }, { receiverId: agentId }],
   })
     .sort({ createdAt: -1 })
-    .limit(10);
+    .limit(5);
 
   const [last7DaysSummary, weeklyGraph, recentActivity] = await Promise.all([
     last7DaysSummaryPromise,
@@ -595,6 +595,20 @@ const getTransactionSummary = async (agentId: string) => {
   };
 };
 
+const getAllTransactionVolume = async () => {
+  const result = await Transaction.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalVolume: {
+          $sum: "$amount",
+        },
+      },
+    },
+  ]);
+  return result[0]?.totalVolume || 0;
+};
+
 export const TransactionService = {
   addMoney,
   withdrawMoney,
@@ -604,4 +618,5 @@ export const TransactionService = {
   cashIn,
   cashOut,
   getTransactionSummary,
+  getAllTransactionVolume,
 };

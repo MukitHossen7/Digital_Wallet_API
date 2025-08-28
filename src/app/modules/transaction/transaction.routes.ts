@@ -49,6 +49,12 @@ transactionRoute.get(
   TransactionController.getAllTransactionHistory
 );
 
+transactionRoute.get(
+  "/volume",
+  checkAuth(Role.ADMIN),
+  TransactionController.getAllTransactionVolume
+);
+
 transactionRoute.post(
   "/cash-in",
   checkAuth(Role.AGENT),

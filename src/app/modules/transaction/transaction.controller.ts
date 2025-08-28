@@ -155,6 +155,19 @@ const getTransactionSummary = catchAsync(
     });
   }
 );
+//cash out Agent
+const getAllTransactionVolume = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await TransactionService.getAllTransactionVolume();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Get All Volume Successfully",
+      data: result,
+    });
+  }
+);
 
 export const TransactionController = {
   addMoney,
@@ -165,4 +178,5 @@ export const TransactionController = {
   cashIn,
   cashOut,
   getTransactionSummary,
+  getAllTransactionVolume,
 };
