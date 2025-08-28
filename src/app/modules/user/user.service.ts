@@ -116,10 +116,45 @@ const getMe = async (id: string) => {
   const user = await User.findById(id).select("-password");
   return user;
 };
+
+const blockUser = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.isActive === "BLOCKED") {
+    throw new AppError(403, "User account already blocked");
+  }
+  await User.findByIdAndUpdate(id, {
+    $set: {
+      isActive: IsActive.BLOCKED,
+    },
+  });
+  return null;
+};
+
+const unBlockUser = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.isActive === "ACTIVE") {
+    throw new AppError(403, "User account already Unblock");
+  }
+  await User.findByIdAndUpdate(id, {
+    $set: {
+      isActive: IsActive.ACTIVE,
+    },
+  });
+  return null;
+};
+
 export const UserServices = {
   createUser,
   approveAgent,
   suspendAgent,
   getAllUserOrAgent,
   getMe,
+  blockUser,
+  unBlockUser,
 };

@@ -33,4 +33,11 @@ userRoute.patch(
   UserControllers.suspendAgent
 );
 
+userRoute.patch("/block/:id", checkAuth(Role.ADMIN), UserControllers.blockUser);
+userRoute.patch(
+  "/unblock/:id",
+  checkAuth(Role.ADMIN),
+  UserControllers.unBlockUser
+);
+
 export default userRoute;

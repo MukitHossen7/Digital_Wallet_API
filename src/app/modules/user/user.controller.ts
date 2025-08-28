@@ -75,10 +75,38 @@ const getMe = catchAsync(
   }
 );
 
+const blockUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id as string;
+    const user = await UserServices.blockUser(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User Block Successfully",
+      data: user,
+    });
+  }
+);
+
+const unBlockUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id as string;
+    const user = await UserServices.unBlockUser(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User UnBlock Successfully",
+      data: user,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
   approveAgent,
   suspendAgent,
   getAllUserOrAgent,
   getMe,
+  blockUser,
+  unBlockUser,
 };
