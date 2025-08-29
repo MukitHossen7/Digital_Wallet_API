@@ -7,6 +7,8 @@ import config from "../../config";
 import passport from "passport";
 import AppError from "../../errorHelpers/AppError";
 import { createUserTokens } from "../../utils/userToken";
+import { JwtPayload } from "jsonwebtoken";
+import { AuthService } from "./auth.service";
 
 // user login
 const createLogin = catchAsync(
@@ -74,8 +76,26 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
   res.redirect(`${config.FRONTEND_URL}/${redirectUrl}`);
 });
 
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const decodedToken = req.user as JwtPayload;
+  if (!decodedToken) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid token");
+  }
+  const newPassword = req.body.newPassword;
+  const oldPassword = req.body.oldPassword;
+
+  await AuthService.changePassword(decodedToken, newPassword, oldPassword);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password change Successfully",
+    data: null,
+  });
+});
+
 export const AuthController = {
   createLogin,
   logOutUser,
   googleLogin,
+  changePassword,
 };
