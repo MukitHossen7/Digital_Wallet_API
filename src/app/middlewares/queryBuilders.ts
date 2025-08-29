@@ -12,7 +12,6 @@ export const queryBuilders =
       const page = Number(query.page) || 1;
       const limit = Number(query.limit) || 10;
       const skip = (page - 1) * limit;
-      console.log(filter);
 
       const excludeField = ["search", "sort", "page", "limit"];
       for (const field of excludeField) {

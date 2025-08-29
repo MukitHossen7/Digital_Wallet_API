@@ -92,9 +92,6 @@ const getAllTransactionHistory = catchAsync(
     // const getAllTransaction =
     //   await TransactionService.getAllTransactionHistory();
     const transactionHistory = res.locals.data;
-    if (transactionHistory.data.length === 0) {
-      throw new AppError(httpStatus.NOT_FOUND, "No transaction history found");
-    }
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
