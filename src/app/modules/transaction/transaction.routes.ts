@@ -45,7 +45,7 @@ transactionRoute.get(
 transactionRoute.get(
   "/",
   checkAuth(Role.ADMIN),
-  queryBuilders(Transaction),
+  queryBuilders(Transaction, ["amount", "_id", "initiatedBy"]),
   TransactionController.getAllTransactionHistory
 );
 
