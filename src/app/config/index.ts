@@ -36,4 +36,9 @@ export default {
     SMTP_PASS: process.env.SMTP_PASS as string,
     SMTP_FROM: process.env.SMTP_FROM as string,
   },
+  CLOUDINARY: {
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+  },
 };

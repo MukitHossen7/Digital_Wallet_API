@@ -5,6 +5,8 @@ import httpStatus from "http-status-codes";
 import bcrypt from "bcryptjs";
 import config from "../../config";
 import { Wallet } from "../wallet/wallet.model";
+import { JwtPayload } from "jsonwebtoken";
+import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 
 const createUser = async (payload: Partial<IUser>) => {
   const session = await User.startSession();
@@ -149,6 +151,43 @@ const unBlockUser = async (id: string) => {
   return null;
 };
 
+const updateUserProfile = async (
+  payload: Partial<IUser>,
+  decoded: JwtPayload
+) => {
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (payload.role) {
+    if (decoded.role === Role.USER || decoded.role === Role.AGENT) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to change user roles"
+      );
+    }
+  }
+
+  if (payload.isActive || payload.isDeleted || payload.isVerified) {
+    if (decoded.role === Role.USER || decoded.role === Role.AGENT) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to change user roles"
+      );
+    }
+  }
+  const updateUser = await User.findByIdAndUpdate(decoded.id, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (payload.picture && user.picture) {
+    await deleteImageFromCLoudinary(user.picture);
+  }
+  return updateUser;
+};
+
 export const UserServices = {
   createUser,
   approveAgent,
@@ -157,4 +196,5 @@ export const UserServices = {
   getMe,
   blockUser,
   unBlockUser,
+  updateUserProfile,
 };

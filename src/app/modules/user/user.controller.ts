@@ -5,6 +5,7 @@ import httpStatus from "http-status-codes";
 import { UserServices } from "./user.service";
 import AppError from "../../errorHelpers/AppError";
 import { JwtPayload } from "jsonwebtoken";
+import { IUser } from "./user.interface";
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -101,6 +102,23 @@ const unBlockUser = catchAsync(
   }
 );
 
+const updateUserProfile = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload: IUser = {
+      ...req.body,
+      picture: req.file?.path,
+    };
+    const decoded = req.user as JwtPayload;
+    const user = await UserServices.updateUserProfile(payload, decoded);
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "Profile Update Successfully",
+      data: user,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
   approveAgent,
@@ -109,4 +127,5 @@ export const UserControllers = {
   getMe,
   blockUser,
   unBlockUser,
+  updateUserProfile,
 };

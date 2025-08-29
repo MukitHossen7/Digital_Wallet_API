@@ -1,9 +1,13 @@
 import express from "express";
 import { zodValidateRequest } from "../../middlewares/zodValidateRequest";
-import { createUserZodSchema } from "./user.zod.validation";
+import {
+  createUserZodSchema,
+  updateUserZodSchema,
+} from "./user.zod.validation";
 import { UserControllers } from "./user.controller";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "./user.interface";
+import { multerUpload } from "../../config/multer.config";
 
 const userRoute = express.Router();
 
@@ -20,6 +24,14 @@ userRoute.get(
 );
 
 userRoute.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
+
+userRoute.patch(
+  "/updateProfile",
+  checkAuth(...Object.values(Role)),
+  multerUpload.single("file"),
+  zodValidateRequest(updateUserZodSchema),
+  UserControllers.updateUserProfile
+);
 
 userRoute.patch(
   "/approve/:id",
