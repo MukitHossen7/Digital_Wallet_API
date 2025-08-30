@@ -3,9 +3,7 @@ import { Wallet } from "../wallet/wallet.model";
 import { ITransaction, PayStatus } from "./transaction.interface";
 import httpStatus from "http-status-codes";
 import { Transaction } from "./transaction.model";
-import { calculateTotalWithFee } from "../../utils/calculateTotalWithFee";
-import { calculateBySendMoneyFee } from "../../utils/calculateBySendMoneyFee";
-import { Role } from "../user/user.interface";
+import { IsActive, Role } from "../user/user.interface";
 import { User } from "../user/user.model";
 import mongoose from "mongoose";
 
@@ -24,6 +22,19 @@ const addMoney = async (
     });
     if (!isAgent) {
       throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
+    }
+
+    if (isAgent.isDeleted === true) {
+      throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+    }
+    if (
+      isAgent.isActive === IsActive.BLOCKED ||
+      isAgent.isActive === IsActive.SUSPENDED
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        `Your account is ${isAgent?.isActive}`
+      );
     }
     const isAgentWallet = await Wallet.findOne({ user: isAgent._id });
     if (!isAgentWallet) {
@@ -105,6 +116,19 @@ const withdrawMoney = async (
     });
     if (!isAgent) {
       throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
+    }
+
+    if (isAgent.isDeleted === true) {
+      throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+    }
+    if (
+      isAgent.isActive === IsActive.BLOCKED ||
+      isAgent.isActive === IsActive.SUSPENDED
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        `Your account is ${isAgent?.isActive}`
+      );
     }
     const isAgentWallet = await Wallet.findOne({ user: isAgent._id });
     if (!isAgentWallet) {
@@ -214,7 +238,18 @@ const sendMoney = async (
         "You cannot send money to yourself."
       );
     }
-
+    if (isReceiverUser.isDeleted === true) {
+      throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+    }
+    if (
+      isReceiverUser.isActive === IsActive.BLOCKED ||
+      isReceiverUser.isActive === IsActive.SUSPENDED
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        `Your account is ${isReceiverUser?.isActive}`
+      );
+    }
     const isReceiverWallet = await Wallet.findOne({ user: isReceiverUser._id });
     if (!isReceiverWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "Receiver wallet not found");
@@ -362,6 +397,18 @@ const cashIn = async (payload: ITransaction, role: string, agentId: string) => {
     if (!isUser) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
+    if (isUser.isDeleted === true) {
+      throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+    }
+    if (
+      isUser.isActive === IsActive.BLOCKED ||
+      isUser.isActive === IsActive.SUSPENDED
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        `Your account is ${isUser?.isActive}`
+      );
+    }
     const userWallet = await Wallet.findOne({ user: isUser._id });
     if (!userWallet) {
       throw new AppError(httpStatus.NOT_FOUND, "User wallet not found");
@@ -443,6 +490,20 @@ const cashOut = async (
     if (!isUser) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
+
+    if (isUser.isDeleted === true) {
+      throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
+    }
+    if (
+      isUser.isActive === IsActive.BLOCKED ||
+      isUser.isActive === IsActive.SUSPENDED
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        `Your account is ${isUser?.isActive}`
+      );
+    }
+
     if (isUser._id.toString() === agentId.toString()) {
       throw new AppError(
         httpStatus.BAD_REQUEST,

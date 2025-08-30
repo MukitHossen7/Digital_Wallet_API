@@ -19,7 +19,7 @@ userRoute.post(
 
 userRoute.get(
   "/",
-  checkAuth(Role.ADMIN, Role.AGENT),
+  checkAuth(...Object.values(Role)),
   UserControllers.getAllUserOrAgent
 );
 

@@ -88,10 +88,10 @@ const approveAgent = async (id: string) => {
     throw new AppError(httpStatus.FORBIDDEN, "This account is deleted");
   }
 
-  if (user.role === Role.AGENT) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is already an AGENT");
+  if (user.isActive === IsActive.ACTIVE) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Agent is already Approve");
   }
-  user.role = Role.AGENT;
+  user.isActive = IsActive.ACTIVE;
   await user.save();
   return user;
 };
@@ -106,10 +106,10 @@ const suspendAgent = async (id: string) => {
     throw new AppError(httpStatus.FORBIDDEN, "This account is deleted");
   }
 
-  if (user.role === Role.USER) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is already suspended");
+  if (user.isActive === IsActive.SUSPENDED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Agent is already suspended");
   }
-  user.role = Role.USER;
+  user.isActive = IsActive.SUSPENDED;
   await user.save();
   return user;
 };
