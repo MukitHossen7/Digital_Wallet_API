@@ -71,7 +71,7 @@ const addMoney = async (
 
     await Wallet.updateOne(
       { _id: isAgentWallet._id },
-      { $inc: { balance: -payload.amount } },
+      { $set: { balance: isAgentWallet.balance - payload.amount } },
       { new: true, runValidators: true, session }
     );
 
