@@ -93,9 +93,30 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createNewAccessToken = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "Refresh token is missing");
+    }
+    const tokenInfo = await AuthService.createNewAccessToken(
+      refreshToken as string
+    );
+
+    setAuthCookie(res, tokenInfo);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "New Access Token Retrieved Successfully",
+      data: tokenInfo,
+    });
+  }
+);
+
 export const AuthController = {
   createLogin,
   logOutUser,
   googleLogin,
   changePassword,
+  createNewAccessToken,
 };

@@ -4,6 +4,7 @@ import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import bcrypt from "bcryptjs";
 import config from "../../config";
+import { createNewAccessTokenUseRefreshToken } from "../../utils/userToken";
 
 const changePassword = async (
   decodedToken: JwtPayload,
@@ -31,6 +32,17 @@ const changePassword = async (
   isExistUser.save();
 };
 
+const createNewAccessToken = async (refreshToken: string) => {
+  const newAccessToken = await createNewAccessTokenUseRefreshToken(
+    refreshToken
+  );
+
+  return {
+    accessToken: newAccessToken.accessToken,
+  };
+};
+
 export const AuthService = {
   changePassword,
+  createNewAccessToken,
 };

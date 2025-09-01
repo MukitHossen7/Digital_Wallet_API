@@ -9,6 +9,7 @@ const authRoute = express.Router();
 
 authRoute.post("/login", AuthController.createLogin);
 authRoute.post("/logout", AuthController.logOutUser);
+authRoute.post("/refresh-token", AuthController.createNewAccessToken);
 authRoute.post(
   "/change-password",
   checkAuth(...Object.values(Role)),
