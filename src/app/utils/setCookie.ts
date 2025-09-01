@@ -1,5 +1,4 @@
 import { Response } from "express";
-import config from "../config";
 
 export interface AuthTokens {
   accessToken?: string;
