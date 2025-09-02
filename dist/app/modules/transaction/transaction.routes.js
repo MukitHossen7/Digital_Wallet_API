@@ -16,7 +16,9 @@ transactionRoute.post("/add-money", (0, checkAuth_1.checkAuth)(user_interface_1.
 transactionRoute.post("/withdraw", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.withdrawMoney);
 transactionRoute.post("/send-money", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.sendMoney);
 transactionRoute.get("/me", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER, user_interface_1.Role.AGENT), transaction_controller_1.TransactionController.getTransactionHistory);
-transactionRoute.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), (0, queryBuilders_1.queryBuilders)(transaction_model_1.Transaction), transaction_controller_1.TransactionController.getAllTransactionHistory);
+transactionRoute.get("/summary", (0, checkAuth_1.checkAuth)(user_interface_1.Role.AGENT), transaction_controller_1.TransactionController.getTransactionSummary);
+transactionRoute.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), (0, queryBuilders_1.queryBuilders)(transaction_model_1.Transaction, ["amount", "_id", "initiatedBy"]), transaction_controller_1.TransactionController.getAllTransactionHistory);
+transactionRoute.get("/volume", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), transaction_controller_1.TransactionController.getAllTransactionVolume);
 transactionRoute.post("/cash-in", (0, checkAuth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.cashIn);
 transactionRoute.post("/cash-out", (0, checkAuth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidateRequest_1.zodValidateRequest)(transaction_zod_validation_1.createTransactionZodSchema), transaction_controller_1.TransactionController.cashOut);
 exports.default = transactionRoute;

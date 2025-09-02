@@ -16,6 +16,7 @@ const config_1 = __importDefault(require("./app/config"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = require("./app");
 const seedAdmin_1 = require("./app/utils/seedAdmin");
+const redis_config_1 = require("./app/config/redis.config");
 let server;
 const A5Server = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -34,6 +35,7 @@ const A5Server = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, redis_config_1.connectRedis)();
     yield A5Server();
     yield (0, seedAdmin_1.seedAdmin)();
 }))();

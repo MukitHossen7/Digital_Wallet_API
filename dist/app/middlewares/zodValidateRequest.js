@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.zodValidateRequest = void 0;
 const zodValidateRequest = (zodSchema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        if (req.body.data) {
+        if ((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.data) {
             req.body = JSON.parse(req.body.data);
         }
         req.body = yield zodSchema.parseAsync(req.body);

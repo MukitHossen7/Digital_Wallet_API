@@ -20,21 +20,25 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const seedAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const isAdminExists = yield user_model_1.User.findOne({
-            email: config_1.default.ADMIN.SUPER_ADMIN_EMAIL,
+            email: config_1.default.ADMIN.ADMIN_EMAIL,
             role: "ADMIN",
         });
         if (isAdminExists) {
-            console.log("Super Admin already exists");
+            console.log("Admin already exists");
             return;
         }
-        const hashedPassword = yield bcryptjs_1.default.hash(config_1.default.ADMIN.SUPER_ADMIN_PASSWORD, Number(config_1.default.BCRYPT_SALT_ROUNDS));
+        const hashedPassword = yield bcryptjs_1.default.hash(config_1.default.ADMIN.ADMIN_PASSWORD, Number(config_1.default.BCRYPT_SALT_ROUNDS));
+        const authProvider = {
+            provider: "credential",
+            providerID: config_1.default.ADMIN.ADMIN_EMAIL,
+        };
         const payload = {
             name: "Admin",
-            email: config_1.default.ADMIN.SUPER_ADMIN_EMAIL,
+            email: config_1.default.ADMIN.ADMIN_EMAIL,
             password: hashedPassword,
-            phone: "+8801234567891",
             role: user_interface_1.Role.ADMIN,
-            address: "123 Gulshan Avenue, Dhaka, Bangladesh",
+            isVerified: true,
+            auths: [authProvider],
         };
         yield user_model_1.User.create(payload);
     }

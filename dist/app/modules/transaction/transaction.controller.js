@@ -22,8 +22,12 @@ const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 // add money
 const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.ADD_MONEY;
+    const payload = req.body;
+    if (type !== payload.type) {
+        throw new AppError_1.default(400, "Transaction type mismatch. Please try again.");
+    }
     const { role, id: userId } = req.user;
-    const addMoney = yield transaction_service_1.TransactionService.addMoney(req.body, type, role, userId);
+    const addMoney = yield transaction_service_1.TransactionService.addMoney(payload, role, userId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
@@ -34,8 +38,12 @@ const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, vo
 //withdraw Money
 const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.WITHDRAW;
+    const payload = req.body;
+    if (type !== payload.type) {
+        throw new AppError_1.default(400, "Transaction type mismatch. Please try again.");
+    }
     const { role, id: userId } = req.user;
-    const withdrawMoney = yield transaction_service_1.TransactionService.withdrawMoney(req.body, type, role, userId);
+    const withdrawMoney = yield transaction_service_1.TransactionService.withdrawMoney(payload, role, userId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
@@ -46,8 +54,12 @@ const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
 //send Money
 const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.SEND_MONEY;
+    const payload = req.body;
+    if (type !== payload.type) {
+        throw new AppError_1.default(400, "Transaction type mismatch. Please try again.");
+    }
     const { role, id: userId } = req.user;
-    const sendMoney = yield transaction_service_1.TransactionService.sendMoney(req.body, type, role, userId);
+    const sendMoney = yield transaction_service_1.TransactionService.sendMoney(payload, role, userId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
@@ -57,13 +69,15 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
 }));
 //get Transaction History by me
 const getTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const query = req.query;
     const { id: userId } = req.user;
-    const getTransaction = yield transaction_service_1.TransactionService.getTransactionHistory(userId);
+    const getTransaction = yield transaction_service_1.TransactionService.getTransactionHistory(userId, query);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "Transaction history retrieved successfully",
-        data: getTransaction,
+        meta: getTransaction.meta,
+        data: getTransaction.transactions,
     });
 }));
 //get Transaction History by admin
@@ -71,9 +85,6 @@ const getAllTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __aw
     // const getAllTransaction =
     //   await TransactionService.getAllTransactionHistory();
     const transactionHistory = res.locals.data;
-    if (transactionHistory.data.length === 0) {
-        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "No transaction history found");
-    }
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
@@ -85,8 +96,12 @@ const getAllTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __aw
 //cash in Agent
 const cashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.ADD_MONEY;
+    const payload = req.body;
+    if (type !== payload.type) {
+        throw new AppError_1.default(400, "Transaction type mismatch. Please try again.");
+    }
     const { role, id: agentId } = req.user;
-    const result = yield transaction_service_1.TransactionService.cashIn(req.body, type, role, agentId);
+    const result = yield transaction_service_1.TransactionService.cashIn(payload, role, agentId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
@@ -97,12 +112,37 @@ const cashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void
 //cash out Agent
 const cashOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = transaction_interface_1.PayType.WITHDRAW;
+    const payload = req.body;
+    if (type !== payload.type) {
+        throw new AppError_1.default(400, "Transaction type mismatch. Please try again.");
+    }
     const { role, id: agentId } = req.user;
-    const result = yield transaction_service_1.TransactionService.cashOut(req.body, type, role, agentId);
+    const result = yield transaction_service_1.TransactionService.cashOut(payload, role, agentId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.CREATED,
         success: true,
         message: "Cash-out complete Successful",
+        data: result,
+    });
+}));
+//cash out Agent
+const getTransactionSummary = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id: agentId } = req.user;
+    const result = yield transaction_service_1.TransactionService.getTransactionSummary(agentId);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Get Agent Summary Successfully",
+        data: result,
+    });
+}));
+//cash out Agent
+const getAllTransactionVolume = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield transaction_service_1.TransactionService.getAllTransactionVolume();
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Get All Volume Successfully",
         data: result,
     });
 }));
@@ -114,4 +154,6 @@ exports.TransactionController = {
     getAllTransactionHistory,
     cashIn,
     cashOut,
+    getTransactionSummary,
+    getAllTransactionVolume,
 };

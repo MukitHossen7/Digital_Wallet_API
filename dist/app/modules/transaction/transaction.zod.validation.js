@@ -17,7 +17,7 @@ exports.createTransactionZodSchema = zod_1.default.object({
     })
         .min(50, "Minimum transaction amount is ৳50")
         .nonnegative(),
-    senderId: zod_1.default.string().optional(),
+    email: zod_1.default.string().optional(),
     receiverId: zod_1.default.string().optional(),
     wallet: zod_1.default.string().optional(),
     initiatedBy: zod_1.default.enum([transaction_interface_1.InitiatedBy.USER, transaction_interface_1.InitiatedBy.AGENT]).optional(),

@@ -62,9 +62,55 @@ const suspendAgent = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         data: suspendAgent,
     });
 }));
+const getMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decoded = req.user;
+    const user = yield user_service_1.UserServices.getMe(decoded.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "You profile Retrieved Successfully",
+        data: user,
+    });
+}));
+const blockUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const user = yield user_service_1.UserServices.blockUser(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "User Block Successfully",
+        data: user,
+    });
+}));
+const unBlockUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const user = yield user_service_1.UserServices.unBlockUser(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "User UnBlock Successfully",
+        data: user,
+    });
+}));
+const updateUserProfile = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const payload = Object.assign(Object.assign({}, req.body), { picture: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path });
+    const decoded = req.user;
+    const user = yield user_service_1.UserServices.updateUserProfile(payload, decoded);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.CREATED,
+        success: true,
+        message: "Profile Update Successfully",
+        data: user,
+    });
+}));
 exports.UserControllers = {
     createUser,
     approveAgent,
     suspendAgent,
     getAllUserOrAgent,
+    getMe,
+    blockUser,
+    unBlockUser,
+    updateUserProfile,
 };

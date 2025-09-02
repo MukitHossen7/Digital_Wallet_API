@@ -3,6 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const mongoose_1 = require("mongoose");
 const user_interface_1 = require("./user.interface");
+const authsSchema = new mongoose_1.Schema({
+    provider: {
+        type: String,
+        required: true,
+    },
+    providerID: {
+        type: String,
+        required: true,
+    },
+}, {
+    versionKey: false,
+    _id: false,
+});
 const userSchema = new mongoose_1.Schema({
     name: {
         type: String,
@@ -17,13 +30,10 @@ const userSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
-        required: [true, "name is required"],
         trim: true,
     },
     phone: {
         type: String,
-        required: [true, "name is required"],
-        unique: true,
         trim: true,
     },
     picture: {
@@ -35,6 +45,10 @@ const userSchema = new mongoose_1.Schema({
         trim: true,
     },
     isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    isVerified: {
         type: Boolean,
         default: false,
     },
@@ -51,5 +65,6 @@ const userSchema = new mongoose_1.Schema({
     commissionRate: {
         type: Number,
     },
+    auths: [authsSchema],
 }, { versionKey: false, timestamps: true });
 exports.User = (0, mongoose_1.model)("User", userSchema);

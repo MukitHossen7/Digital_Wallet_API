@@ -40,6 +40,9 @@ const transactionSchema = new mongoose_1.Schema({
         type: Number,
         default: 0,
     },
+    email: {
+        type: String,
+    },
     status: {
         type: String,
         enum: Object.values(transaction_interface_1.PayStatus),
