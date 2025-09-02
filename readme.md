@@ -7,7 +7,7 @@
 ## Live Link
 
 ```
-https://digital-wallet-server-nine.vercel.app/
+https://l2-b5-assignment-5-server.vercel.app/
 ```
 
 ## Admin And Agent Email, Password
@@ -18,8 +18,12 @@ Admin:
   password: Admin123@
 
 Agent:
- email: mim@gmail.com
- password: Password@123
+ email: mukithossen7@gmail.com
+ password: Agent123@
+
+ User:
+ email: hossenmukit7@gmail.com
+ password: User123@
 ```
 
 ## Features
@@ -33,6 +37,7 @@ Agent:
 - Admins can manage wallets, users, agents, and transactions
 - Complete transaction tracking and validation
 - Modular, scalable project structure
+- If a user is not verified, they cannot log in. After verification, an email will be sent to the user, and then they can log in.
 
 ---
 
@@ -49,13 +54,19 @@ Agent:
 - **cookie-parser**
 - **http-status-codes**
 - **jsonwebtoken**
+- **cloudinary**
+- **multer**
+- **nodemailer**
+- **multer-storage-cloudinary**
+- **passport**
+- **redis**
 
 ---
 
 ## Installation & Setup
 
 ```
-git clone https://github.com/MukitHossen7/Digital_Wallet_API.git
+git clone https://github.com/MukitHossen7/Digital_Wallet_API
 ```
 
 ```
@@ -142,7 +153,7 @@ src/
 #### 1.User Registration
 
 ```
-POST /api/v1/register
+POST /api/v1/users/register
 ```
 
 ```json
@@ -159,7 +170,9 @@ Request Body:
 #### 2. Get All Users or Agents (Admin)
 
 ```
+
 GET /api/v1/users?role=USER|AGENT
+
 ```
 
 ```json
@@ -205,6 +218,52 @@ Response:
 }
 ```
 
+#### 5.Update Profile (User,Agent, Admin)
+
+```
+PATCH /api/v1/users/updateProfile
+```
+
+```json
+Request Body:
+{
+  "name": "abc",
+  "phone": "01365479546",
+  "address":"Dhaka Bangladesh",
+  "image": "image.jpg"
+}
+```
+
+#### 6.Block User (Admin)
+
+```
+PATCH /api/v1/users/block/:id
+```
+
+```json
+Response:
+{
+  "success": true,
+  "message": "User has been blocked",
+  "data": null
+}
+```
+
+#### 7.UnBlock User (Admin)
+
+```
+PATCH /api/v1/users/unblock/:id
+```
+
+```json
+Response:
+{
+  "success": true,
+  "message": "User has been unblock",
+  "data": null
+}
+```
+
 ### Auth Endpoints
 
 #### 1.User Login
@@ -233,6 +292,45 @@ Response:
   "success": true,
   "message": "User logged out successfully"
 }
+```
+
+#### 3.Create Refresh Token
+
+```
+POST /api/v1/auth/refresh-token
+```
+
+#### 4.Change Password
+
+```
+POST /api/v1/auth/change-password
+```
+
+```json
+Request Body:
+{
+  "newPassword": "123456789",
+  "oldPassword": "Password@123",
+}
+
+```
+
+#### 5.Google Login
+
+```
+GET /api/v1/auth/google
+```
+
+#### 6.Send OTP
+
+```
+POST /api/v1/otp/send
+```
+
+#### 7.Verify OTP
+
+```
+POST /api/v1/otp/verify
 ```
 
 ### Wallet Endpoints
@@ -298,7 +396,9 @@ POST /api/v1/transactions/add-money
 ```json
 Request Body:
 {
-    "amount": 50
+    "amount": 100,
+    "agent-email": "abc@gmail.com",
+    "type": "ADDMONEY"
 }
 ```
 
@@ -311,7 +411,9 @@ POST /api/v1/transactions/withdraw
 ```json
 Request Body:
 {
-    "amount": 500
+     "amount": 100,
+    "agent-email": "abc@gmail.com",
+    "type": "WITHDRAW"
 }
 ```
 
@@ -325,7 +427,8 @@ POST /api/v1/transactions/send-money
 Request Body:
 {
     "amount": 100,
-    "receiverId": "688e3cf5dbe9c3cb7b0cd266"
+    "user-email": "abc@gmail.com",
+    "type": "SENDMONEY"
 }
 ```
 
@@ -368,9 +471,9 @@ POST /api/v1/transactions/cash-in
 ```json
 Request Body:
 {
-    "amount": 50,
-    "receiverId": "688e3cf5dbe9c3cb7b0cd266"
-
+    "amount": 200,
+    "user-email": "hossenmukit7@gmail.com",
+    "type": "ADDMONEY"
 }
 ```
 
@@ -384,8 +487,8 @@ POST /api/v1/transactions/cash-out
 Request Body:
 {
     "amount": 2000,
-    "senderId": "688e3cf5dbe9c3cb7b0cd266"
-
+    "user-email": "hossenmukit7@gmail.com",
+    "type": "WITHDRAW"
 }
 ```
 
@@ -394,13 +497,23 @@ Request Body:
 ## Dependencies
 
 - "bcryptjs": "^3.0.2",
+- "cloudinary": "^1.41.3",
 - "cookie-parser": "^1.4.7",
 - "cors": "^2.8.5",
 - "dotenv": "^17.2.0",
+- "ejs": "^3.1.10",
 - "express": "^5.1.0",
+- "express-session": "^1.18.2",
 - "http-status-codes": "^2.3.0",
 - "jsonwebtoken": "^9.0.2",
 - "mongoose": "^8.16.4",
+- "multer": "^2.0.2",
+- "multer-storage-cloudinary": "^4.0.0",
+- "nodemailer": "^7.0.5",
+- "passport": "^0.7.0",
+- "passport-google-oauth20": "^2.0.0",
+- "passport-local": "^1.0.0",
+- "redis": "^5.8.2",
 - "zod": "^3.25.76"
 
 ## DevDependencies
@@ -408,8 +521,15 @@ Request Body:
 - "@types/cookie-parser": "^1.4.9",
 - "@types/cors": "^2.8.19",
 - "@types/express": "^5.0.3",
+- "@types/express-session": "^1.18.2",
 - "@types/jsonwebtoken": "^9.0.10",
+- "@types/passport": "^1.0.17",
+- "@types/passport-google-oauth20": "^2.0.16",
+- "@types/passport-local": "^1.0.38",
 - "ts-node-dev": "^2.0.0",
-- "typescript": "^5.8.3"
+- "typescript": "^5.8.3",
+- "@types/ejs": "^3.1.5",
+- "@types/multer": "^2.0.0",
+- "@types/nodemailer": "^7.0.1"
 
 ---
