@@ -16,6 +16,20 @@ authRoute.post(
   AuthController.changePassword
 );
 
+authRoute.post(
+  "/set-password",
+  checkAuth(...Object.values(Role)),
+  AuthController.setPassword
+);
+
+authRoute.post(
+  "/reset-password",
+  checkAuth(...Object.values(Role)),
+  AuthController.resetPassword
+);
+
+authRoute.post("/forgot-password", AuthController.forgotPassword);
+
 authRoute.get(
   "/google",
   async (req: Request, res: Response, next: NextFunction) => {

@@ -9,6 +9,7 @@ import { User } from "../modules/user/user.model";
 import { IsActive, Role } from "../modules/user/user.interface";
 import bcrypt from "bcryptjs";
 import config from ".";
+import { Wallet } from "../modules/wallet/wallet.model";
 
 // credential Login use passPort.js
 passport.use(
@@ -125,6 +126,14 @@ passport.use(
                 providerID: profile.id,
               },
             ],
+          });
+
+          await Wallet.create({
+            user: user._id,
+            balance: 50,
+          });
+          return done(null, user, {
+            message: "User created successfully with Wallet",
           });
         }
         return done(null, user, { message: "User authenticated successfully" });
