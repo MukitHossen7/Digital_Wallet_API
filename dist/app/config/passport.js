@@ -19,6 +19,7 @@ const user_model_1 = require("../modules/user/user.model");
 const user_interface_1 = require("../modules/user/user.interface");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const _1 = __importDefault(require("."));
+const wallet_model_1 = require("../modules/wallet/wallet.model");
 // credential Login use passPort.js
 passport_1.default.use(new passport_local_1.Strategy({
     usernameField: "email",
@@ -106,6 +107,13 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
                         providerID: profile.id,
                     },
                 ],
+            });
+            yield wallet_model_1.Wallet.create({
+                user: user._id,
+                balance: 50,
+            });
+            return done(null, user, {
+                message: "User created successfully with Wallet",
             });
         }
         return done(null, user, { message: "User authenticated successfully" });

@@ -118,10 +118,45 @@ const createNewAccessToken = (0, catchAsync_1.catchAsync)((req, res, next) => __
         data: tokenInfo,
     });
 }));
+const setPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const { password } = req.body;
+    yield auth_service_1.AuthService.setPassword(decodedToken, password);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Password set Successfully",
+        data: null,
+    });
+}));
+const resetPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const { newPassword, id } = req.body;
+    yield auth_service_1.AuthService.resetPassword(decodedToken, newPassword, id);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Password reset Successfully",
+        data: null,
+    });
+}));
+const forgotPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    yield auth_service_1.AuthService.forgotPassword(email);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Password forgot Successfully",
+        data: null,
+    });
+}));
 exports.AuthController = {
     createLogin,
     logOutUser,
     googleLogin,
     changePassword,
     createNewAccessToken,
+    setPassword,
+    resetPassword,
+    forgotPassword,
 };
