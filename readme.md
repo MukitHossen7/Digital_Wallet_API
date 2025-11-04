@@ -7,7 +7,7 @@
 ## Live Link
 
 ```
-https://l2-b5-assignment-5-server.vercel.app/
+https://neopay-api.vercel.app/
 ```
 
 ## Admin And Agent Email, Password

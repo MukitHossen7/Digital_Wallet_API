@@ -4,6 +4,7 @@ import authRoute from "../modules/auth/auth.routes";
 import transactionRoute from "../modules/transaction/transaction.routes";
 import walletRoute from "../modules/wallet/wallet.routes";
 import otpRoute from "../modules/otp/otp.route";
+import statsRoute from "../modules/stats/stats.routes";
 
 const routes = Router();
 
@@ -12,5 +13,6 @@ routes.use("/auth", authRoute);
 routes.use("/transactions", transactionRoute);
 routes.use("/wallets", walletRoute);
 routes.use("/otp", otpRoute);
+routes.use("/stats", statsRoute);
 
 export default routes;
